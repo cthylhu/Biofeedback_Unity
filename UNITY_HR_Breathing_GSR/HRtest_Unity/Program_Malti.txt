@@ -1,0 +1,51 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
+
+namespace MultiThread
+{
+    //Reading Serial port data and processing in this class
+    public class Datafetch
+    {
+        int p = 0;
+        public void subThread()
+        {
+            while (true)
+            {
+                p++;
+                Console.WriteLine(p);
+                Thread.Sleep(500);
+            }
+        }
+
+        // This method is used to read data
+        public int GetData()
+        {
+            return (p);
+        }
+    };
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //Intialze a instance of DataFetch
+            var obj = new Datafetch();
+            Thread mytest = new Thread(obj.subThread);
+            //Strat the thread
+            mytest.Start();
+
+            Console.WriteLine("***Sub Thread strats");
+
+            while (true)
+            {
+                Console.WriteLine(obj.GetData());
+
+                Thread.Sleep(100);
+            }
+        }
+    }
+}

@@ -1,0 +1,197 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO.Ports;
+using System.Diagnostics;
+
+
+namespace ECGToHeartBeat
+{
+    class Globes
+    {
+
+    }
+    class Program
+    {
+        public static int HRBeatCounter, HRBeatCounterPre;
+        public static double peakAG;
+        public static double sample;
+        //double sample_last;
+        public static double _attack;
+        public static double _decay;
+        public static double gain;
+        public static double sampleAG;
+        public static double lower_bound;
+        public static double upper_bound;
+        public static int near_peak;
+        //double peak_candidate;
+        // int detected;
+        public static int beats, AvgNum;
+        //int BPM;
+        public static long tc,interval;
+        public static double timeSum, HrBeat, result, aa,bb;
+        //	long tl[50];
+        //public static int index;
+//        public static DateTime start;
+        //public static TimeSpan timeDiff;
+        public static Stopwatch sw;
+        //public static int ECGCounter;
+        public static double [] timeBuffer = new double[11];
+        //double avgSeg;
+        //double varSeg;
+        // int p;
+
+        static void Main(string[] args)
+        {
+            //ECGCounter = 0;
+            peakAG = 0;
+            _attack = 0.9875;
+            _decay = 0.992;
+            lower_bound = 0.9975;
+            upper_bound = 0.99;
+            //upper_bound = 1;
+            near_peak = 0; 
+            beats = 0;
+            //System.Diagnostics.Stopwatch sw;
+            //Serial Port
+            sw = Stopwatch.StartNew();
+            sw.Start();
+            SerialPort mySerialPort = new SerialPort("COM11");  //Please change the Arduino Port # here
+
+            mySerialPort.BaudRate = 115200;
+            mySerialPort.Parity = Parity.None;
+            mySerialPort.StopBits = StopBits.One;
+            mySerialPort.DataBits = 8;
+            mySerialPort.Handshake = Handshake.None;
+
+            mySerialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+            mySerialPort.Open();
+            //
+            Console.WriteLine("Press any key to continue...");
+            Console.WriteLine();
+            Console.ReadKey();
+            mySerialPort.Close();
+
+
+        }
+        private static void DataReceivedHandler(
+                        object sender,
+                        SerialDataReceivedEventArgs e)
+        {
+            //            ThreadRun = 1;
+            //AvgNum = 5;
+         
+            SerialPort sp = (SerialPort)sender;
+            string indata = sp.ReadLine();
+            if (indata != null)
+            {
+                //System.IO.File.WriteAllText(@"G:\ECGToHeartBeat\WriteText.txt", indata);
+              //  using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"G:\ECGToHeartBeat\WriteText.txt", true))
+              //  {
+              //      file.WriteLine(indata);
+              //      file.Close();
+              //  }
+                //file.Close();
+                sample = Double.Parse(indata);
+
+
+            }
+            if (sample > peakAG)
+                peakAG = _attack * sample;
+            else
+                peakAG = _decay * peakAG;
+
+            gain = _attack / peakAG;
+            sampleAG = gain * sample;
+            if (sampleAG >= lower_bound)
+                near_peak = 1;
+
+            if ((near_peak == 1) && (sampleAG < upper_bound))
+            {
+                near_peak = 0;
+                sw.Stop();
+                interval = sw.ElapsedMilliseconds;
+                //tc = sw.Elapsed;
+                //HRBeatCounterPre = HRBeatCounter;
+                HRBeatCounter++;
+                if (HRBeatCounter == 11)
+                {
+                    HRBeatCounter = 1;
+
+                }
+                if (sw.ElapsedMilliseconds > 300)
+                {
+
+                    switch (HRBeatCounter)
+                    { 
+                    
+                        case 1:
+                            timeBuffer[1] = Convert.ToDouble(interval)/1000; 
+                            break;
+                        case 2:
+                            timeBuffer[2] = Convert.ToDouble(interval)/1000; 
+                            break;
+                        case 3:
+                            timeBuffer[3] = Convert.ToDouble(interval)/1000; 
+                            break;
+                        case 4:
+                            timeBuffer[4] = Convert.ToDouble(interval)/1000; 
+                            break;
+                        case 5:
+                            timeBuffer[5] = Convert.ToDouble(interval)/1000; 
+                            break;
+                        case 6:
+                            timeBuffer[6] = Convert.ToDouble(interval)/1000; 
+                            break;
+                        case 7:
+                            timeBuffer[7] = Convert.ToDouble(interval)/1000; 
+                            break;
+                        case 8:
+                            timeBuffer[8] = Convert.ToDouble(interval)/1000; 
+                            break;
+                        case 9:
+                            timeBuffer[9] = Convert.ToDouble(interval)/1000;
+                            break;
+                        case 10:
+                            timeBuffer[10] = Convert.ToDouble(interval) / 1000;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                //HRBeatCounter++;
+                if (HRBeatCounter == 10)
+                {
+                    //HRBeatCounter = 0;
+                    for (int i = 1; i < 11; i++)
+                    {
+                        timeSum = timeSum + timeBuffer[i];
+
+                    }
+                    if (timeSum != 0)
+                    {
+                        HrBeat = 10 / timeSum * 60;                
+                    }
+                    timeSum = 0;
+
+                }
+
+                //if (ECGCounter)
+                sw.Reset();
+                sw.Start();
+                //beats++;
+
+
+            }
+
+                Console.WriteLine(HrBeat);
+
+        }
+    }
+
+
+
+
+}
