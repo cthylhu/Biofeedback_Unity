@@ -321,25 +321,27 @@ public class Sc : MonoBehaviour {
 	public Datafetch obj;
 	public Thread mytest;
 	//Dll import
-    [DllImport("C:/Users/Cathy/Desktop/AllUpdated/UNITY_HR_Breathing_GSR/drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]//
+    [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static int lightstone_Initial();				//initialization
 
-    [DllImport("C:/Users/Cathy/Desktop/AllUpdated/UNITY_HR_Breathing_GSR/drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
+    [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static int lightstone_ReadBPM();				//read heart beat data
 
-    [DllImport("C:/Users/Cathy/Desktop/AllUpdated/UNITY_HR_Breathing_GSR/drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
+    [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static int lightstone_SetAvgNum(int num);	//set avergae peaks number
 
-    [DllImport("C:/Users/Cathy/Desktop/AllUpdated/UNITY_HR_Breathing_GSR/drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
+    [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static float lightstone_Readscl();			//read skin Conductance data
 
-    [DllImport("C:/Users/Cathy/Desktop/AllUpdated/UNITY_HR_Breathing_GSR/drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
+    [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static int lightstone_Exit();
 	//public static int ECGCounter;
 	public FileWriter fileWriterGSR;
 	public FileWriter fileWriterBPM;
 	public FileWriter fileWriterMindStrenth,fileWriterMindAtten,fileWriterMindmed;
 	void Start () {
+		// check current directory to ensure relative paths for libraries are correct:
+		UnityEngine.Debug.Log("Current Directory: " + Directory.GetCurrentDirectory());
 		fileWriterGSR = new FileWriter();
 		fileWriterBPM = new FileWriter();
 		fileWriterMindStrenth = new FileWriter();
