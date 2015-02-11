@@ -15,7 +15,7 @@ public class FileWriter
 {
 	public void TxtSaveByStr(string savePath, string txtStr)
 	{
-		string path = savePath;//@"E:\MyTest.txt";
+		string path = savePath;
 		// This text is added only once to the file. 
 		if (!File.Exists(path)) 
 		{
@@ -126,32 +126,32 @@ public class Datafetch
 
 // Write ECG raw data 
 				string ECG = sample.ToString();
-                string ECGPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\ECG.txt";
+				string ECGPath = @"../../Data/ECG.txt";
 				fileWriterECG.TxtSaveByStr(ECGPath,ECG);
 // Write HR
 				string HR = HrBeat.ToString();
-                string HRPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\HR.txt";
+                string HRPath = @"../../Data/HR.txt";
 				fileWriterHR.TxtSaveByStr(HRPath,HR);
 // Write HR from Pulseoximeter
                 string eHR = eHRp.ToString();
-                string eHRpPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\eHRp.txt";
+                string eHRpPath = @"../../Data/eHRp.txt";
                 fileWriterEHRp.TxtSaveByStr(eHRpPath, eHR);
 // Write HRV
 				string HRV = Hrv.ToString();
-                string HRVPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\HRV.txt";
+                string HRVPath = @"../../Data/HRV.txt";
 				fileWriterHRV.TxtSaveByStr(HRVPath,HRV);
 // Write GSR
 				string eGSR = eGSRvalue.ToString();
-                string eGSRPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\eGSR.txt";
+                string eGSRPath = @"../../Data/eGSR.txt";
 				fileWriterEGSR.TxtSaveByStr(eGSRPath,eGSR);
 
 // Write Breathing raw data
 				string Breathing = sampleAir.ToString();
-                string BreathingPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\Breathing.txt";
+                string BreathingPath = @"../../Data/Breathing.txt";
 				fileWriterBreathing.TxtSaveByStr(BreathingPath,Breathing);
 // Write BR
 				string BR = BreathingBeat.ToString();
-                string BRPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\BR.txt";
+                string BRPath = @"../../Data/BR.txt";
 				fileWriterBR.TxtSaveByStr(BRPath,BR);				
 			}
 // calculate the ECG peak
@@ -180,7 +180,7 @@ public class Datafetch
 				if ((sw.ElapsedMilliseconds < 1500)&&(sw.ElapsedMilliseconds > 500))
 				{
 					string IntervalString = interval.ToString();
-                    string IntervalPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\Interval.txt";
+                    string IntervalPath = @"../../Data/Interval.txt";
 					fileWriterInterval.TxtSaveByStr(IntervalPath,IntervalString);
 					timeBuffer [HRBeatCounter] = Convert.ToDouble(interval)/1000; 
 					HRBeatCounter++;
@@ -256,7 +256,7 @@ public class Datafetch
 				if (interval_Air > 1000)
 				{
 					string IntervalBreString = interval_Air.ToString();
-                    string IntervalBrePath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\IntervalBre.txt";
+                    string IntervalBrePath = @"../../Data/IntervalBre.txt";
 					fileWriterInterval.TxtSaveByStr(IntervalBrePath,IntervalBreString);
 					timeBuffer_Air [BreathingCounter_air] = Convert.ToDouble(interval_Air)/1000; 
 					BreathingCounter_air++;
@@ -410,27 +410,27 @@ public class Sc : MonoBehaviour {
 		//GSR from wild divine
 		scldata = lightstone_Readscl();
 		string GSRString = scldata.ToString("R");
-        string GSRPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\GSR.txt";
+        string GSRPath = @"../../Data/GSR.txt";
 		fileWriterGSR.TxtSaveByStr(GSRPath,GSRString);
 		//BPM from wild divine
 		BPM = lightstone_ReadBPM ();
 		string BPMString = BPM.ToString();
-		string BPMPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\BPM.txt";
+		string BPMPath = @"../../Data/BPM.txt";
 		fileWriterBPM.TxtSaveByStr(BPMPath,BPMString);
 
 		//BPM from wild divine
 		string SigStrenString = poorSignal.ToString();
-		string SigStrenPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\MindStrenth.txt";
+		string SigStrenPath = @"../../Data/MindStrenth.txt";
 		fileWriterMindStrenth.TxtSaveByStr(SigStrenPath,SigStrenString);
 
 		//BPM from wild divine
 		string AttenString = attention.ToString();
-		string AttenPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\Atten.txt";
+		string AttenPath = @"../../Data/Atten.txt";
 		fileWriterMindAtten.TxtSaveByStr(AttenPath,AttenString);
 
 		//BPM from wild divine
 		string MedString = meditation.ToString();
-		string MedPath = @"C:\Users\Cathy\Desktop\AllUpdated\UNITY_HR_Breathing_GSR\Data\Med.txt";
+		string MedPath = @"../../Data/Med.txt";
 		fileWriterMindmed.TxtSaveByStr(MedPath,MedString);
 
 		//guiText.text = "Heart Rate: " + (int)(obj.HrBeat)+ " Breathing Rate: " + (int)(obj.BreathingBeat) + " Skin Conduct: "+ scldata;//"Time Interval: " + (int)(obj.interval) + 
