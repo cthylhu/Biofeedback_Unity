@@ -11,19 +11,24 @@ using System.Runtime.InteropServices;
 using System.IO;
 //using System.Threading.Tasks;
 
+/// <summary>
+/// Simple file writer that puts data files in a known foder with a known suffix.
+/// </summary>
 public class FileWriter
 {
-	public void TxtSaveByStr(string savePath, string txtStr)
+	static public string dataPath = @"../../Data/";
+	static public string dataSuffix = @".txt";
+
+	static public void TxtSaveByStr(string saveName, string txtStr)
 	{
-		string path = savePath;
+		string path = dataPath + saveName + dataSuffix;
 		// This text is added only once to the file. 
 		if (!File.Exists(path)) 
 		{
 			// Create a file to write to. 
 			using (StreamWriter swrite = File.CreateText(path)) 
 			{}
-		}
-		
+		}		
 		// This text is always added, making the file longer over time if it is not deleted. 
 		using (StreamWriter swrite = File.AppendText(path)) 
 		{
@@ -67,8 +72,7 @@ public class Datafetch
 	public double [] timeBuffer = new double[10];	
 	public double [] HrvBuffer = new double[10]; // 
 	public double [] timeBuffer_Air = new double[5];
-    public FileWriter fileWriterECG, fileWriterInterval, fileWriterBreathing, fileWriterBreInterval, fileWriterHR, fileWriterEHRp, fileWriterHRV, fileWriterBR, fileWriterEGSR;
-	public double MaxValueECG = 0, MaxValueBre = 0;
+    public double MaxValueECG = 0, MaxValueBre = 0;
 	public int MaxCounterECG = 0, PeakFlagECG = 0, MaxCounterBre = 0, PeakFlagBre = 0;
 	public double [] MaxBufferECG = new double[400];
 	public double [] AirBuffer = new double[50];
@@ -81,15 +85,6 @@ public class Datafetch
 	public void subThread()
 	{
 		stream.Open(); //Open the Serial Stream.
-		fileWriterECG = new FileWriter();
-		fileWriterHR = new FileWriter();
-        fileWriterEHRp = new FileWriter();
-		fileWriterHRV = new FileWriter();
-		fileWriterBreathing = new FileWriter ();
-		fileWriterBR = new FileWriter();
-		fileWriterEGSR = new FileWriter(); 
-		fileWriterInterval = new FileWriter();
-		fileWriterBreInterval = new FileWriter();
 		sw = new Stopwatch();
 		sw_Air = new Stopwatch();
 //		start = DateTime.Now;
@@ -126,33 +121,26 @@ public class Datafetch
 
 // Write ECG raw data 
 				string ECG = sample.ToString();
-				string ECGPath = @"../../Data/ECG.txt";
-				fileWriterECG.TxtSaveByStr(ECGPath,ECG);
+				FileWriter.TxtSaveByStr("ECG", ECG);
 // Write HR
 				string HR = HrBeat.ToString();
-                string HRPath = @"../../Data/HR.txt";
-				fileWriterHR.TxtSaveByStr(HRPath,HR);
+				FileWriter.TxtSaveByStr("HR", HR);
 // Write HR from Pulseoximeter
                 string eHR = eHRp.ToString();
-                string eHRpPath = @"../../Data/eHRp.txt";
-                fileWriterEHRp.TxtSaveByStr(eHRpPath, eHR);
+                FileWriter.TxtSaveByStr("eHRp",  eHR);
 // Write HRV
 				string HRV = Hrv.ToString();
-                string HRVPath = @"../../Data/HRV.txt";
-				fileWriterHRV.TxtSaveByStr(HRVPath,HRV);
+				FileWriter.TxtSaveByStr("HRV", HRV);
 // Write GSR
 				string eGSR = eGSRvalue.ToString();
-                string eGSRPath = @"../../Data/eGSR.txt";
-				fileWriterEGSR.TxtSaveByStr(eGSRPath,eGSR);
+				FileWriter.TxtSaveByStr("eGSR", eGSR);
 
 // Write Breathing raw data
 				string Breathing = sampleAir.ToString();
-                string BreathingPath = @"../../Data/Breathing.txt";
-				fileWriterBreathing.TxtSaveByStr(BreathingPath,Breathing);
+				FileWriter.TxtSaveByStr("Breathing", Breathing);
 // Write BR
 				string BR = BreathingBeat.ToString();
-                string BRPath = @"../../Data/BR.txt";
-				fileWriterBR.TxtSaveByStr(BRPath,BR);				
+				FileWriter.TxtSaveByStr("BR", BR);				
 			}
 // calculate the ECG peak
 			sample0 = GetData ();
@@ -180,8 +168,7 @@ public class Datafetch
 				if ((sw.ElapsedMilliseconds < 1500)&&(sw.ElapsedMilliseconds > 500))
 				{
 					string IntervalString = interval.ToString();
-                    string IntervalPath = @"../../Data/Interval.txt";
-					fileWriterInterval.TxtSaveByStr(IntervalPath,IntervalString);
+					FileWriter.TxtSaveByStr("Interval", IntervalString);
 					timeBuffer [HRBeatCounter] = Convert.ToDouble(interval)/1000; 
 					HRBeatCounter++;
 					if (HRBeatCounter == 10)
@@ -256,8 +243,7 @@ public class Datafetch
 				if (interval_Air > 1000)
 				{
 					string IntervalBreString = interval_Air.ToString();
-                    string IntervalBrePath = @"../../Data/IntervalBre.txt";
-					fileWriterInterval.TxtSaveByStr(IntervalBrePath,IntervalBreString);
+					FileWriter.TxtSaveByStr("IntervalBre", IntervalBreString);
 					timeBuffer_Air [BreathingCounter_air] = Convert.ToDouble(interval_Air)/1000; 
 					BreathingCounter_air++;
 					if (BreathingCounter_air == 5)
@@ -336,17 +322,10 @@ public class Sc : MonoBehaviour {
     [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static int lightstone_Exit();
 	//public static int ECGCounter;
-	public FileWriter fileWriterGSR;
-	public FileWriter fileWriterBPM;
-	public FileWriter fileWriterMindStrenth,fileWriterMindAtten,fileWriterMindmed;
+
 	void Start () {
 		// check current directory to ensure relative paths for libraries are correct:
 		UnityEngine.Debug.Log("Current Directory: " + Directory.GetCurrentDirectory());
-		fileWriterGSR = new FileWriter();
-		fileWriterBPM = new FileWriter();
-		fileWriterMindStrenth = new FileWriter();
-		fileWriterMindAtten = new FileWriter();
-		fileWriterMindmed = new FileWriter();
 		obj = new Datafetch();
 		obj.sw = Stopwatch.StartNew();
 		obj.sw_Air = Stopwatch.StartNew();
@@ -410,28 +389,23 @@ public class Sc : MonoBehaviour {
 		//GSR from wild divine
 		scldata = lightstone_Readscl();
 		string GSRString = scldata.ToString("R");
-        string GSRPath = @"../../Data/GSR.txt";
-		fileWriterGSR.TxtSaveByStr(GSRPath,GSRString);
+		FileWriter.TxtSaveByStr("GSR", GSRString);
 		//BPM from wild divine
 		BPM = lightstone_ReadBPM ();
 		string BPMString = BPM.ToString();
-		string BPMPath = @"../../Data/BPM.txt";
-		fileWriterBPM.TxtSaveByStr(BPMPath,BPMString);
+		FileWriter.TxtSaveByStr("BPM", BPMString);
 
 		//BPM from wild divine
 		string SigStrenString = poorSignal.ToString();
-		string SigStrenPath = @"../../Data/MindStrenth.txt";
-		fileWriterMindStrenth.TxtSaveByStr(SigStrenPath,SigStrenString);
+		FileWriter.TxtSaveByStr("MindStrength", SigStrenString);
 
 		//BPM from wild divine
 		string AttenString = attention.ToString();
-		string AttenPath = @"../../Data/Atten.txt";
-		fileWriterMindAtten.TxtSaveByStr(AttenPath,AttenString);
+		FileWriter.TxtSaveByStr("Atten", AttenString);
 
 		//BPM from wild divine
 		string MedString = meditation.ToString();
-		string MedPath = @"../../Data/Med.txt";
-		fileWriterMindmed.TxtSaveByStr(MedPath,MedString);
+		FileWriter.TxtSaveByStr("Med", MedString);
 
 		//guiText.text = "Heart Rate: " + (int)(obj.HrBeat)+ " Breathing Rate: " + (int)(obj.BreathingBeat) + " Skin Conduct: "+ scldata;//"Time Interval: " + (int)(obj.interval) + 
 	}
