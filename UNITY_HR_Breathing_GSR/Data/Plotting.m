@@ -13,7 +13,7 @@ wGSR = load('GSR.txt');%  GSR from wild divine sensor
 wHR = load('BPM.txt');%  Heart rate from wild divine sensor
 
 % load mindwave sensor data
-mStrength = load('MindStrenth.txt');% signal strength
+mStrength = load('MindStrength.txt');% signal strength
 mMed = load('Med.txt');% Medition score
 mAtten = load('Atten.txt');%Attention score
 
