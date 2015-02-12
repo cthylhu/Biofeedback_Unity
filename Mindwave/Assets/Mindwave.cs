@@ -13,9 +13,10 @@ public class Mindwave : MonoBehaviour {
 	public float attention = 0;
 	public float meditation = 0;
 	public int connectStatus = 0;
+	public float Value = 0;
 //	public ThinkGearController wavemind;
 	void Start () {
-		Portname = "COM7";
+		Portname = "COM5";
 		handleID = ThinkGear.TG_GetNewConnectionId();
 		connectStatus = ThinkGear.TG_Connect(handleID, Portname, baudRate, packetType);
 // or that the headset is not turned on
@@ -45,7 +46,7 @@ public class Mindwave : MonoBehaviour {
 	}
 	void Update () {
 		UpdateHeadsetData ();
-		guiText.text = "Connect Status: " + connectStatus.ToString()+ "Signal Strength: " + poorSignal.ToString("F2")+ "Attention: " + attention.ToString("F2")+ "meditation: " + meditation.ToString("F2");//obj.HRV.ToString("F2") + "\n" + "Resistance: " + obj.resistance.ToString("F2") + " Conductance: " + obj.conductance.ToString("F2");
+		//guiText.text = "Connect Status: " + connectStatus.ToString()+ "Value" + Value.ToString()+ " Signal Strength: " + poorSignal.ToString("F2")+ "Attention: " + attention.ToString("F2")+ "meditation: " + meditation.ToString("F2");//obj.HRV.ToString("F2") + "\n" + "Resistance: " + obj.resistance.ToString("F2") + " Conductance: " + obj.conductance.ToString("F2");
 	}
 	void OnHeadsetDisconnectionRequest(){
 		ThinkGear.TG_FreeConnection(handleID);
@@ -70,6 +71,7 @@ public class Mindwave : MonoBehaviour {
 			values.Add("highBeta", GetDataValue(ThinkGear.DATA_BETA2));
 			values.Add("lowGamma", GetDataValue(ThinkGear.DATA_GAMMA1));
 			values.Add("highGamma", GetDataValue(ThinkGear.DATA_GAMMA2));
+			Value = GetDataValue(ThinkGear.DATA_DELTA)+GetDataValue(ThinkGear.DATA_THETA)+GetDataValue(ThinkGear.DATA_ALPHA1)+GetDataValue(ThinkGear.DATA_ALPHA2);
 			attention =  GetDataValue(ThinkGear.DATA_ATTENTION);
 			meditation = GetDataValue(ThinkGear.DATA_MEDITATION);	
 			poorSignal = 200 - GetDataValue(ThinkGear.DATA_POOR_SIGNAL);			
@@ -78,6 +80,30 @@ public class Mindwave : MonoBehaviour {
 		
 	}
 //	
+	void OnGUI()
+	{
+		//		GUILayout.BeginHorizontal();
+		//		GUILayout.Space(Screen.width-250);
+		//		GUILayout.Label(signalIcons[indexSignalIcons]);	
+		//		GUILayout.EndHorizontal();
+		//		GUILayout.Space(Screen.width-250);
+		//		GUILayout.Label(new Rect(650, 650, 300, 50),"Heart Rate:  + (int)(obj.HrBeat)",largeFont);
+		//		GUILayout.Label(Rect(430,320,500,500),"<color=green><size=100>Win</size></color>");
+		GUILayout.Label("delta: " + GetDataValue(ThinkGear.DATA_DELTA));
+		GUILayout.Label("theta: " + GetDataValue(ThinkGear.DATA_THETA));
+		GUILayout.Label("lowAlpha: " + GetDataValue(ThinkGear.DATA_ALPHA1));
+		GUILayout.Label("highAlpha: " + GetDataValue(ThinkGear.DATA_ALPHA2));
+		GUILayout.Label("lowBeta: " + GetDataValue(ThinkGear.DATA_BETA1));
+		GUILayout.Label("highBeta " + GetDataValue(ThinkGear.DATA_BETA2));
+		GUILayout.Label("lowGamma: " + GetDataValue(ThinkGear.DATA_GAMMA1));
+		GUILayout.Label("highGamma: " + GetDataValue(ThinkGear.DATA_GAMMA2));
+		GUILayout.Label("Signal strength: " + (200 - GetDataValue(ThinkGear.DATA_POOR_SIGNAL)));
+		GUILayout.Label("attention: " + GetDataValue(ThinkGear.DATA_ATTENTION));
+		GUILayout.Label("meditation: " + GetDataValue(ThinkGear.DATA_MEDITATION));
+		//		GUILayout.Label("Delta:" + delta);
+		
+	}
+
 	// Convenience method to trigger an event on all GOs
 	private void TriggerEvent(string eventName, System.Object parameter){
 		foreach(GameObject go in FindObjectsOfType(typeof(GameObject)))
