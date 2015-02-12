@@ -465,6 +465,7 @@ public class Sc : MonoBehaviour {
 			values.Add("highBeta", GetDataValue(ThinkGear.DATA_BETA2));
 			values.Add("lowGamma", GetDataValue(ThinkGear.DATA_GAMMA1));
 			values.Add("highGamma", GetDataValue(ThinkGear.DATA_GAMMA2));
+			Value = GetDataValue(ThinkGear.DATA_DELTA) + GetDataValue(ThinkGear.DATA_THETA) + GetDataValue(ThinkGear.DATA_ALPHA1) + GetDataValue(ThinkGear.DATA_ALPHA2);
 			attention =  GetDataValue(ThinkGear.DATA_ATTENTION);
 			meditation = GetDataValue(ThinkGear.DATA_MEDITATION);	
 			poorSignal = 200 - GetDataValue(ThinkGear.DATA_POOR_SIGNAL);			
@@ -490,5 +491,6 @@ public class Sc : MonoBehaviour {
 		obj.swith = 0;
 		guiText.text = "Over";
 		lightstone_Exit();						//free the resources of sensor
+		OnHeadsetDisconnectionRequest(); //todo: check if still necessary?
 	}
 }
