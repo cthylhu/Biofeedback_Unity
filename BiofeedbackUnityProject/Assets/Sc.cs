@@ -16,7 +16,7 @@ using System.IO;
 /// </summary>
 public class FileWriter
 {
-	static public string dataPath = @"../../Data/";
+	static public string dataPath = @"../Data/";
 	static public string dataSuffix = @".txt";
 
 	static public void TxtSaveByStr(string saveName, string txtStr)
@@ -307,19 +307,19 @@ public class Sc : MonoBehaviour {
 	public Datafetch obj;
 	public Thread mytest;
 	//Dll import
-    [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
+    [DllImport("./drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static int lightstone_Initial();				//initialization
 
-    [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
+    [DllImport("./drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static int lightstone_ReadBPM();				//read heart beat data
 
-    [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
+    [DllImport("./drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static int lightstone_SetAvgNum(int num);	//set avergae peaks number
 
-    [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
+    [DllImport("./drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static float lightstone_Readscl();			//read skin Conductance data
 
-    [DllImport("../../drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
+    [DllImport("./drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
 	extern static int lightstone_Exit();
 	//public static int ECGCounter;
 
@@ -465,7 +465,7 @@ public class Sc : MonoBehaviour {
 			values.Add("highBeta", GetDataValue(ThinkGear.DATA_BETA2));
 			values.Add("lowGamma", GetDataValue(ThinkGear.DATA_GAMMA1));
 			values.Add("highGamma", GetDataValue(ThinkGear.DATA_GAMMA2));
-			Value = GetDataValue(ThinkGear.DATA_DELTA) + GetDataValue(ThinkGear.DATA_THETA) + GetDataValue(ThinkGear.DATA_ALPHA1) + GetDataValue(ThinkGear.DATA_ALPHA2);
+			float sumValue = GetDataValue(ThinkGear.DATA_DELTA) + GetDataValue(ThinkGear.DATA_THETA) + GetDataValue(ThinkGear.DATA_ALPHA1) + GetDataValue(ThinkGear.DATA_ALPHA2);
 			attention =  GetDataValue(ThinkGear.DATA_ATTENTION);
 			meditation = GetDataValue(ThinkGear.DATA_MEDITATION);	
 			poorSignal = 200 - GetDataValue(ThinkGear.DATA_POOR_SIGNAL);			

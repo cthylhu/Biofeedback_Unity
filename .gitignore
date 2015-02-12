@@ -1,6 +1,6 @@
 # Specific to the Biofeedback project:
-# don't add the data files:
-UNITY_HR_Breathing_GSR/Data/
+# don't add the data files
+/Data/
 
 
 # =============== #
