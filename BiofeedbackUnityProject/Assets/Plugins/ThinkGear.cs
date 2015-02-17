@@ -1,38 +1,58 @@
 /*
- * @(#)ThinkGear.cs    1.0    Aug 07, 2008
+ * @(#)ThinkGear.cs    4.1    Jun 26, 2009
  *
- * Copyright (c) 2008 NeuroSky, Inc. All Rights Reserved
+ * Copyright (c) 2008-2009 NeuroSky, Inc. All Rights Reserved
  * NEUROSKY PRORIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
 
 using System.Runtime.InteropServices;
 
 /**
- * The ThinkGear Connection API is a set of library functions which allow
- * applications to communicate with ThinkGear modules.  The ThinkGear Connection
- * functions are implemented in a DLL library.
+ * @file ThinkGear.cs
+ *
+ * The ThinkGear Communications Driver (TGCD) is a set of library functions
+ * which allows applications to communicate with ThinkGear modules.  The
+ * TGCD functions are implemented as a shared library (.dll on Windows,
+ * .bundle on Mac OS X).
  * <p>
  * This ThinkGear class for C# is simply a thin interface layer which uses
- * InteropServices to provide access to the API functions in the ThinkGear
- * Connection DLL library, allowing C# programs to use the DLL to communicate
- * with ThinkGear modules.
+ * InteropServices to provide access to the API functions in the TGCD
+ * library, allowing C# programs to use the TGCD to communicate with
+ * ThinkGear modules.
  * <p>
- * Because the class is merely a thin interface to the underlying DLL, it is
- * entirely dependent on the underlying DLL to function, and is therefore only
- * supported on platforms which can run the DLL (i.e. Windows-compatible platforms).
+ * Because the class is merely a thin interface to the underlying shared
+ * TGCD library, it is entirely dependent on the underlying TGCD library
+ * to function, and is therefore only supported on platforms which can
+ * run the TGCD itself (i.e. Windows and Mac OS X platforms).
  * <p>
- * Programs that wish to read data from a ThinkGear module must use, at a minimum,
- * the following function/method calls:
- * <ol>
- * <li>{@link #TG_GetNewConnectionId()}
- * <li>{@link #TG_Connect(int, String, int, int)}
- * <li>{@link #TG_ReadPackets(int, int)}
- * <li>{@link #TG_GetValue(int, int)}
- * <li>{@link #TG_FreeConnection(int)}
- * </ol>
+ * There are three "tiers" of functions in this API, where functions
+ * of a lower "tier" should not be called until an appropriate function
+ * in the "tier" above it is called first:
  *
- * The contents of this file are generated from thinkgear.h, with the following
- * text manipulations:
+ * @code
+ *
+ * Tier 1:  Call anytime
+ *     TG_GetDriverVersion()
+ *     TG_GetNewConnectionId()
+ *
+ * Tier 2:  Requires TG_GetNewConnectionId()
+ *     TG_SetStreamLog()
+ *     TG_SetDataLog()
+ *     TG_Connect()
+ *     TG_FreeConnection()
+ *
+ * Tier 3:  Requires TG_Connect()
+ *     TG_ReadPackets()
+ *     TG_GetValue()
+ *     TG_SendByte()
+ *     TG_SetBaudrate()
+ *     TG_SetDataFormat()
+ *     TG_Disconnect()
+ *
+ * @endcode
+ *
+ * The contents of this file are generated from thinkgear.h, with the
+ * following text manipulations:
  *   - "THINKGEAR_API" => "[DllImport ("ThinkGear")] public static extern"
  *   - "const char *"  => "string "
  *   - "#define TG_"   => "public const int "
@@ -40,14 +60,23 @@ using System.Runtime.InteropServices;
  *
  * @author  Kelvin Soo
  * @author  Horace Ko
+ * @version 4.1 Jun 26, 2009 Kelvin Soo
+ *   - Updated name of library from ThinkGear Connection API to
+ *     ThinkGear Communications Driver (TGCD).  The library still
+ *     uses ThinkGear COnnection objects and IDs to communicate.
  * @version 1.0 Aug 07, 2008
  */
 public class ThinkGear {
 
-    /* CONSTANTS */
+    /**
+     * Maximum number of Connections that can be requested before being
+     * required to free one.
+     */
     public const int MAX_CONNECTION_HANDLES = 128;
 
-
+    /**
+     * Baud rate for use with TG_Connect() and TG_SetBaudrate().
+     */
     public const int BAUD_1200         =   1200;
     public const int BAUD_2400         =   2400;
     public const int BAUD_4800         =   4800;
@@ -55,10 +84,16 @@ public class ThinkGear {
     public const int BAUD_57600        =  57600;
     public const int BAUD_115200       = 115200;
 
+    /**
+     * Data format for use with TG_Connect() and TG_SetDataFormat().
+     */
     public const int STREAM_PACKETS      = 0;
     public const int STREAM_5VRAW        = 1;
     public const int STREAM_FILE_PACKETS = 2;
 
+    /**
+     * Data type that can be requested from TG_GetValue().
+     */
     public const int DATA_BATTERY      = 0;
     public const int DATA_POOR_SIGNAL  = 1;
     public const int DATA_ATTENTION    = 2;
@@ -75,10 +110,11 @@ public class ThinkGear {
 
 
     /**
-     * Returns a number indicating the version of the driver library accessed
-     * by this API.  Useful for debugging DLL versioning issues.
+     * Returns a number indicating the version of the ThinkGear Communications
+     * Driver (TGCD) library accessed by this API.  Useful for debugging
+     * version-related issues.
      *
-     * @return The ThinkGear Connection library's version number.
+     * @return The TGCD library's version number.
      */
     [DllImport ("ThinkGear")] public static extern int
     TG_GetDriverVersion();
@@ -200,7 +236,7 @@ public class ThinkGear {
      * @return -2 if @c serialPortName could not be opened as a serial
      *         communication port for any reason.  Check that the name
      *         is a valid COM port on your system.
-     * 
+     *
      * @return -3 if @c serialBaudrate is not a valid TG_BAUD_* value.
      *
      * @return -4 if @c serialDataFormat is not a valid TG_STREAM_* type.
