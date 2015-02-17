@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 //using System.Threading.Tasks;
 
-public class Datafetch
+public class Datafetch : MonoBehaviour 
 {
 	SerialPort stream = new SerialPort("COM4", 115200); //Set the port (com4) and the baud rate (9600, is standard on most devices)
 	public double ECGVoltage,BreVoltage,eGSRvalue;

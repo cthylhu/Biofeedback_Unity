@@ -84,6 +84,8 @@ GameObject:
   - 4: {fileID: 1031380619}
   - 132: {fileID: 1031380618}
   - 114: {fileID: 1031380617}
+  - 114: {fileID: 1031380621}
+  - 114: {fileID: 1031380620}
   m_Layer: 0
   m_Name: GUI Text
   m_TagString: Untagged
@@ -110,6 +112,7 @@ MonoBehaviour:
   attention: 0
   meditation: 0
   connectStatus: 0
+  obj: {fileID: 0}
 --- !u!132 &1031380618
 GUIText:
   m_ObjectHideFlags: 0
@@ -144,7 +147,74 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+--- !u!114 &1031380620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1031380616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0814636576dcce4fb6ec4634da5c908, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1031380621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1031380616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 862e739997559472ca2aef0d7dbc9dca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ECGVoltage: 0
+  BreVoltage: 0
+  eGSRvalue: 0
+  swith: 0
+  HRBeatCounter: 0
+  BreathingCounter_air: 0
+  AirCounter: 0
+  ECGCounter: 0
+  HrvCounter: 0
+  peakAG: 0
+  sample: 0
+  sample0: 0
+  _attack: .98750000000000004
+  _decay: .99199999999999999
+  gain: 0
+  sampleAG: 0
+  lower_bound: .99750000000000005
+  upper_bound: .98999999999999999
+  near_peak: 0
+  peakAGAir: 0
+  sampleAir: 0
+  sampleAir0: 0
+  _attackAir: .98750000000000004
+  _decayAir: .99199999999999999
+  gainAir: 0
+  sampleAGAir: 0
+  lower_boundAir: .99750000000000005
+  upper_boundAir: .98999999999999999
+  near_peakAir: 0
+  beats: 0
+  AvgNum: 0
+  timeSum: 0
+  HrBeat: 0
+  timeSum_Air: 0
+  BreathingBeat: 0
+  Hrv: 0
+  eHRp: 0
+  MaxValueECG: 0
+  MaxValueBre: 0
+  MaxCounterECG: 0
+  PeakFlagECG: 0
+  MaxCounterBre: 0
+  PeakFlagBre: 0
+  SumFlag: 1
+  SumFlag_air: 1
+  SumHRVflag: 1
 --- !u!1 &1796475035
 GameObject:
   m_ObjectHideFlags: 0
@@ -212,11 +282,8 @@ Camera:
     m_Bits: 4294967295
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
   m_HDR: 0
   m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: .0219999999
 --- !u!4 &1796475040
 Transform:
   m_ObjectHideFlags: 0
@@ -228,4 +295,3 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1

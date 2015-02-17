@@ -6,7 +6,7 @@ using System.IO;
 /// <summary>
 /// Simple file writer that puts data files in a known folder with a known suffix.
 /// </summary>
-public class FileWriter
+public class FileWriter : MonoBehaviour 
 {
 	static public string dataPath = @"../Data/";
 	static public string dataSuffix = @".txt";
