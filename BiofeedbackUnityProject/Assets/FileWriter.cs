@@ -1,12 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.IO;
+﻿using System.IO;
 
 
 /// <summary>
 /// Simple file writer that puts data files in a known folder with a known suffix.
 /// </summary>
-public class FileWriter : MonoBehaviour 
+public class FileWriter
 {
 	static public string dataPath = @"../Data/";
 	static public string dataSuffix = @".txt";
