@@ -51,8 +51,8 @@ LIGHTSTONE_DECLSPEC lightstone_info lightstone_get_info(lightstone* dev)
 		int transferred = 0;
 		int char_count = 0;
 		int ii;
-
-		while(1)
+		int limitedwhile;
+		for (limitedwhile = 1; limitedwhile < 100; ++limitedwhile) // limited version of while(1), try 100 times to get valid data
 		{
 			transferred = lightstone_read(dev, InputReport);
 			if(transferred == 0x8 || transferred == 0x9)
