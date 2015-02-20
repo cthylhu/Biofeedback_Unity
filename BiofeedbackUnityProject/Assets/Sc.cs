@@ -13,9 +13,6 @@ using System.IO;
 
 
 public class Sc : MonoBehaviour {
-	public GUIText HRText;
-	public float scldata;	// scldata indicates the Skin Conductance Level measurement
-	public int BPM;
 	GUIStyle largeFont,smallFont;
 	// Use this for Mindwave initialization
 	private int handleID = -1;
@@ -29,21 +26,6 @@ public class Sc : MonoBehaviour {
 	//HR & breathing thread
 	public Datafetch obj;
 	public Thread mytest;
-	//Dll import
-    [DllImport("./drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
-	extern static int lightstone_Initial();				//initialization
-
-    [DllImport("./drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
-	extern static int lightstone_ReadBPM();				//read heart beat data
-
-    [DllImport("./drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
-	extern static int lightstone_SetAvgNum(int num);	//set avergae peaks number
-
-    [DllImport("./drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
-	extern static float lightstone_Readscl();			//read skin Conductance data
-
-    [DllImport("./drivers/WildDivine_SetAvgNum/lightstone_avg.dll")]
-	extern static int lightstone_Exit();
 	//public static int ECGCounter;
 
 	void Start () {
@@ -58,8 +40,6 @@ public class Sc : MonoBehaviour {
 		mytest = new Thread(obj.subThread);
 		//Strat the thread
 		mytest.Start();
-		int p = lightstone_Initial();   		//This is the initiaization of Wild Divine sensor
-		lightstone_SetAvgNum(10);                // set avergae peaks number
 		largeFont = new GUIStyle();
 		smallFont = new GUIStyle();
 		largeFont.fontSize = 32;
@@ -108,40 +88,20 @@ public class Sc : MonoBehaviour {
 	}
 
 	void UpdateHeartRateText() {
-		//Debug.Log("HR: " + heartRate);
-		//GSR from wild divine
-		scldata = lightstone_Readscl();
-		string GSRString = scldata.ToString("R");
-		FileWriter.TxtSaveByStr("GSR", GSRString);
-		//BPM from wild divine
-		BPM = lightstone_ReadBPM ();
-		string BPMString = BPM.ToString();
-		FileWriter.TxtSaveByStr("BPM", BPMString);
 
-		//BPM from wild divine
 		string SigStrenString = poorSignal.ToString();
 		FileWriter.TxtSaveByStr("MindStrength", SigStrenString);
 
-		//BPM from wild divine
 		string AttenString = attention.ToString();
 		FileWriter.TxtSaveByStr("Atten", AttenString);
 
-		//BPM from wild divine
 		string MedString = meditation.ToString();
 		FileWriter.TxtSaveByStr("Med", MedString);
 
-		//guiText.text = "Heart Rate: " + (int)(obj.HrBeat)+ " Breathing Rate: " + (int)(obj.BreathingBeat) + " Skin Conduct: "+ scldata;//"Time Interval: " + (int)(obj.interval) + 
 	}
 
 	void OnGUI()
 	{
-//		GUILayout.BeginHorizontal();
-//		GUILayout.Space(Screen.width-250);
-//		GUILayout.Label(signalIcons[indexSignalIcons]);	
-//		GUILayout.EndHorizontal();
-//		GUILayout.Space(Screen.width-250);
-//		GUILayout.Label(new Rect(650, 650, 300, 50),"Heart Rate:  + (int)(obj.HrBeat)",largeFont);
-//		GUILayout.Label(Rect(430,320,500,500),"<color=green><size=100>Win</size></color>");
 		GUILayout.Label("E-health sensor",largeFont);
 		GUILayout.Label("Heart Rate (from ECG): " + (int)(obj.HrBeat),smallFont);
 		GUILayout.Label("Heart Interval: " + (int)(obj.interval),smallFont);
@@ -150,17 +110,12 @@ public class Sc : MonoBehaviour {
 		GUILayout.Label("Breathing Interval: " + (int)(obj.interval_Air),smallFont);
 		GUILayout.Label("GSR: " + (obj.eGSRvalue),smallFont);
         GUILayout.Label("Heart Rate (from Pulseoximeter): " + (obj.eHRp), smallFont);
-		//Wild divine
-		GUILayout.Label("Wild Divine sensor",largeFont);
-		GUILayout.Label("Skin Conduct: " + scldata,smallFont);
-		GUILayout.Label("Heart beat: " + BPM,smallFont);
 		//Mindwave
 		GUILayout.Label("Mindwave sensor",largeFont);
 		GUILayout.Label("Signal strength: " + poorSignal,smallFont);
 		GUILayout.Label("attention: " + attention,smallFont);
 		GUILayout.Label("meditation: " + meditation,smallFont);
 //		GUILayout.Label("Delta:" + delta);
-
 	}
 
 // Mindwave function
@@ -210,10 +165,8 @@ public class Sc : MonoBehaviour {
 	}
 
 	void OnDestroy () {
-		//print("Script was destroyed");
 		obj.swith = 0;
 		guiText.text = "Over";
-		lightstone_Exit();						//free the resources of sensor
 		OnHeadsetDisconnectionRequest(); //todo: check if still necessary?
 	}
 }
