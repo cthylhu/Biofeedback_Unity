@@ -1,4 +1,3 @@
-using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ using System.Text;
 using System.Threading;
 //using System.Threading.Tasks;
 
-public class Datafetch : MonoBehaviour 
+public class Datafetch
 {
 	SerialPort stream = new SerialPort("COM4", 115200); //Set the port (com4) and the baud rate (9600, is standard on most devices)
 	public double ECGVoltage,BreVoltage,eGSRvalue;
