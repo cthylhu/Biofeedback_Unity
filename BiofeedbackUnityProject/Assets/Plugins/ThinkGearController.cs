@@ -14,10 +14,10 @@ using System.Collections;
  * Events are defined in the class using the C# delegate/event mechanism:
  */
 
-public delegate void HeadsetConnected(); // Sent when the headset has successfully sent data the first time
+public delegate void HeadsetConnected(int packetCount); // Sent when the headset has successfully sent data the first time
 public delegate void HeadsetDisconnected(); // Sent when the headset has been disconnected
 public delegate void HeadsetDataReceived(IDictionary<string, float> data); // Sent when data is received from the headset
-public delegate void HeadsetConnectionError(); // Sent when a startReadingData attempt failed.
+public delegate void HeadsetConnectionError(int packetError); // Sent when a startReadingData attempt failed.
 
 public class ThinkGearController: MonoBehaviour
 {
@@ -60,29 +60,39 @@ public class ThinkGearController: MonoBehaviour
 		// now we need to check that the headset is returning valid data.
 		// the headset transmits data every second, so sleep for some 
 		// interval longer than that to guarantee data received in the 
-		// serial buffer
-		//
-		// we use the Unity-specific yield statement here so that the
-		// thread doesn't block everything else while it's sleeping, 
-		// like Thread.Sleep() would have.
-		yield return new WaitForSeconds (1.5f);
-		int packetCount = ThinkGear.TG_ReadPackets (handleID, -1);
-		// if we received some packets, then the connection attempt was successful
-		// notify the GOs in the game
-		if (packetCount > 0) {
-			if (OnHeadsetConnected != null) {
-				OnHeadsetConnected();
+		// serial buffer, and retry a few times:
+		int retries = 0;
+		int packetCount = 0;
+		for (retries = 0; retries < 50; ++retries) {
+			Debug.Log ("MindWave initial connection try " + retries);
+			// we use the Unity-specific yield statement here so that the
+			// thread doesn't block everything else while it's sleeping, 
+			// like Thread.Sleep() would have.
+			yield return new WaitForSeconds (1.0f);
+			packetCount = ThinkGear.TG_ReadPackets (handleID, -1);
+			// if we received some packets, then the connection attempt was successful
+			// notify the GOs in the game
+			if (packetCount > 0) {
+				// successfully received the first set of data!
+				Debug.Log (string.Format("Mindwave got data after trying {0} times! packetCount: {1}", retries, packetCount), this);
+				if (OnHeadsetConnected != null) {
+					OnHeadsetConnected(packetCount);
+				}
+				ReportData (); // initial reading
+				// now set up a repeating invocation to update the headset data
+				InvokeRepeating ("UpdateHeadsetData", 0.0f, 1.0f);
+				yield break; // we are done here
+			} else if (packetCount < 0) {
+				break; // an error code, exit the for loop
 			}
-			// now set up a repeating invocation to update the headset data
-			InvokeRepeating ("UpdateHeadsetData", 0.0f, 1.0f);
-		} else {
-			// if we didn't find anything, then the connection attempt
-			// failed. notify the rest of the GOs in the game
-			if (OnHeadsetConnectionError != null) {
-				OnHeadsetConnectionError();
-			}
-			reset ();
 		}
+		Debug.Log (string.Format("MindWave: No data after trying {0} times! packetCount: {1}", retries, packetCount), this);
+		// this is an error condition, report it
+		// either we didn't find anything, or there was an error
+		if (OnHeadsetConnectionError != null) {
+			OnHeadsetConnectionError(packetCount);
+		}
+		reset ();
 	}
 
 	private void reset()
@@ -106,25 +116,31 @@ public class ThinkGearController: MonoBehaviour
 	}
 
 	// Repeating callback method to retrieve data from the headset
-	private void UpdateHeadsetData ()
+	private int UpdateHeadsetData ()
 	{
 		int packetCount = ThinkGear.TG_ReadPackets (handleID, -1);
-		IDictionary<string, float> values = new Dictionary<string, float> ();
 		if (packetCount > 0) {
-			values.Add ("poorSignal", GetDataValue (ThinkGear.DATA_POOR_SIGNAL));  
-			values.Add ("attention", GetDataValue (ThinkGear.DATA_ATTENTION));
-			values.Add ("meditation", GetDataValue (ThinkGear.DATA_MEDITATION));
-			values.Add ("delta", GetDataValue (ThinkGear.DATA_DELTA));
-			values.Add ("theta", GetDataValue (ThinkGear.DATA_THETA));
-			values.Add ("lowAlpha", GetDataValue (ThinkGear.DATA_ALPHA1));
-			values.Add ("highAlpha", GetDataValue (ThinkGear.DATA_ALPHA2));
-			values.Add ("lowBeta", GetDataValue (ThinkGear.DATA_BETA1));
-			values.Add ("highBeta", GetDataValue (ThinkGear.DATA_BETA2));
-			values.Add ("lowGamma", GetDataValue (ThinkGear.DATA_GAMMA1));
-			values.Add ("highGamma", GetDataValue (ThinkGear.DATA_GAMMA2));
-			if (OnHeadsetDataReceived != null) {
-				OnHeadsetDataReceived(values);
-			}
+			ReportData();
+		}
+		return packetCount;
+	}
+
+	private void ReportData ()
+	{
+		IDictionary<string, float> values = new Dictionary<string, float> ();
+		values.Add ("poorSignal", GetDataValue (ThinkGear.DATA_POOR_SIGNAL));  
+		values.Add ("attention", GetDataValue (ThinkGear.DATA_ATTENTION));
+		values.Add ("meditation", GetDataValue (ThinkGear.DATA_MEDITATION));
+		values.Add ("delta", GetDataValue (ThinkGear.DATA_DELTA));
+		values.Add ("theta", GetDataValue (ThinkGear.DATA_THETA));
+		values.Add ("lowAlpha", GetDataValue (ThinkGear.DATA_ALPHA1));
+		values.Add ("highAlpha", GetDataValue (ThinkGear.DATA_ALPHA2));
+		values.Add ("lowBeta", GetDataValue (ThinkGear.DATA_BETA1));
+		values.Add ("highBeta", GetDataValue (ThinkGear.DATA_BETA2));
+		values.Add ("lowGamma", GetDataValue (ThinkGear.DATA_GAMMA1));
+		values.Add ("highGamma", GetDataValue (ThinkGear.DATA_GAMMA2));
+		if (OnHeadsetDataReceived != null) {
+			OnHeadsetDataReceived(values);
 		}
 	}
 

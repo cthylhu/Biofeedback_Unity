@@ -50,14 +50,14 @@ public class MindWaveSensors : MonoBehaviour
 		tgController.startReadingData();
 	}
 	
-	public void HandleOnHeadsetConnected()
+	public void HandleOnHeadsetConnected(int packetCount)
 	{
-		statusText.text = "Connected";
+		statusText.text = string.Format ("Connected and {0} packets read initially", packetCount);
 	}
 
-	public void HandleOnHeadsetConnectionError()
+	public void HandleOnHeadsetConnectionError(int packetError)
 	{
-		statusText.text = "Connection Error";
+		statusText.text = string.Format ("Connection Error: {0}", packetError);
 		// potential TODO: from here we should set the UI checkbox to unchecked again
 	}
 
