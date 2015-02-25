@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,13 +10,13 @@ using System.Text;
 using System.Threading;
 //using System.Threading.Tasks;
 
-public class Datafetch
+public class EHealthArduino
 {
 	SerialPort stream = new SerialPort("COM4", 115200); //Set the port (com4) and the baud rate (9600, is standard on most devices)
 	public double ECGVoltage,BreVoltage,eGSRvalue;
 	public int swith;
 	public  int HRBeatCounter = 0, BreathingCounter_air = 0, AirCounter = 0, ECGCounter = 0, HrvCounter = 0;
-//	HR peak parameters
+	//	HR peak parameters
 	public double peakAG = 0;
 	public double sample = 0,sample0 = 0;
 	public double _attack = 0.9875;
@@ -26,7 +26,7 @@ public class Datafetch
 	public double lower_bound = 0.9975;
 	public double upper_bound = 0.99;
 	public int near_peak = 0;
-//	Breathing peak parameters
+	//	Breathing peak parameters
 	public double peakAGAir = 0;
 	public double sampleAir = 0,sampleAir0 = 0;
 	public double _attackAir = 0.9875;
@@ -36,15 +36,15 @@ public class Datafetch
 	public double lower_boundAir = 0.9975;
 	public double upper_boundAir = 0.99;
 	public int near_peakAir = 0;
-
+	
 	public int beats = 0, AvgNum = 0;
 	public long tc,interval,interval_Air;
-    public double timeSum, HrBeat, timeSum_Air, BreathingBeat, Hrv, eHRp;
+	public double timeSum, HrBeat, timeSum_Air, BreathingBeat, Hrv, eHRp;
 	public Stopwatch sw, sw_Air;
 	public double [] timeBuffer = new double[10];	
 	public double [] HrvBuffer = new double[10]; // 
 	public double [] timeBuffer_Air = new double[5];
-    public double MaxValueECG = 0, MaxValueBre = 0;
+	public double MaxValueECG = 0, MaxValueBre = 0;
 	public int MaxCounterECG = 0, PeakFlagECG = 0, MaxCounterBre = 0, PeakFlagBre = 0;
 	public double [] MaxBufferECG = new double[400];
 	public double [] AirBuffer = new double[50];
@@ -53,13 +53,13 @@ public class Datafetch
 	public double  SumFlag = 1,SumFlag_air = 1,SumHRVflag = 1;
 	public DateTime start;
 	public TimeSpan timeDiff;
-
+	
 	public void subThread()
 	{
 		stream.Open(); //Open the Serial Stream.
 		sw = new Stopwatch();
 		sw_Air = new Stopwatch();
-//		start = DateTime.Now;
+		//		start = DateTime.Now;
 		while (swith==1) {
 			string value = stream.ReadLine(); 
 			string[] vec2 = value.Split(',');
@@ -69,8 +69,8 @@ public class Datafetch
 				ECGVoltage = double.Parse(vec2[1]);//double.Parse(value.Substring(1));
 				BreVoltage = double.Parse(vec2[2]);
 				eGSRvalue = double.Parse(vec2[3]);
-                eHRp = double.Parse(vec2[4]);           // HR from Pulseoximeter
-//Get the ECG max
+				eHRp = double.Parse(vec2[4]);           // HR from Pulseoximeter
+				//Get the ECG max
 				MaxBufferECG[MaxCounterECG] = ECGVoltage;
 				MaxValueECG = MaxBufferECG.Max();
 				MaxCounterECG ++;
@@ -80,46 +80,46 @@ public class Datafetch
 					PeakFlagECG = 1;
 				else
 					PeakFlagECG = 0;
-//Get the breathing max
-//				MaxBufferBre[MaxCounterBre] = BreVoltage;
-//				MaxValueBre = MaxBufferBre.Max();
-//				MaxCounterBre ++;
-//				if (MaxCounterBre == 400)
-//					MaxCounterBre = 0;
-//				if (BreVoltage > 0.75*MaxValueBre)
-//					PeakFlagBre = 1;
-//				else
-//					PeakFlagBre = 0;
-
-// Write ECG raw data 
+				//Get the breathing max
+				//				MaxBufferBre[MaxCounterBre] = BreVoltage;
+				//				MaxValueBre = MaxBufferBre.Max();
+				//				MaxCounterBre ++;
+				//				if (MaxCounterBre == 400)
+				//					MaxCounterBre = 0;
+				//				if (BreVoltage > 0.75*MaxValueBre)
+				//					PeakFlagBre = 1;
+				//				else
+				//					PeakFlagBre = 0;
+				
+				// Write ECG raw data 
 				string ECG = sample.ToString();
-				FileWriter.TxtSaveByStr("ECG", ECG);
-// Write HR
+//				FileWriter.TxtSaveByStr("ECG", ECG);
+				// Write HR
 				string HR = HrBeat.ToString();
-				FileWriter.TxtSaveByStr("HR", HR);
-// Write HR from Pulseoximeter
-                string eHR = eHRp.ToString();
-                FileWriter.TxtSaveByStr("eHRp",  eHR);
-// Write HRV
+//				FileWriter.TxtSaveByStr("HR", HR);
+				// Write HR from Pulseoximeter
+				string eHR = eHRp.ToString();
+//				FileWriter.TxtSaveByStr("eHRp",  eHR);
+				// Write HRV
 				string HRV = Hrv.ToString();
-				FileWriter.TxtSaveByStr("HRV", HRV);
-// Write GSR
+//				FileWriter.TxtSaveByStr("HRV", HRV);
+				// Write GSR
 				string eGSR = eGSRvalue.ToString();
-				FileWriter.TxtSaveByStr("eGSR", eGSR);
-
-// Write Breathing raw data
+//				FileWriter.TxtSaveByStr("eGSR", eGSR);
+				
+				// Write Breathing raw data
 				string Breathing = sampleAir.ToString();
-				FileWriter.TxtSaveByStr("Breathing", Breathing);
-// Write BR
+//				FileWriter.TxtSaveByStr("Breathing", Breathing);
+				// Write BR
 				string BR = BreathingBeat.ToString();
-				FileWriter.TxtSaveByStr("BR", BR);				
+//				FileWriter.TxtSaveByStr("BR", BR);				
 			}
-// calculate the ECG peak
-			sample0 = GetData ();
-//			ECGBuffer [ECGCounter] = sample0;
-//			ECGCounter ++;
-//			if (ECGCounter == 3)
-//				ECGCounter = 0;
+			// calculate the ECG peak
+			sample0 = ECGVoltage;
+			//			ECGBuffer [ECGCounter] = sample0;
+			//			ECGCounter ++;
+			//			if (ECGCounter == 3)
+			//				ECGCounter = 0;
 			sample = sample0;//ECGBuffer.Average();
 			if (sample > peakAG)
 				peakAG = _attack * sample;
@@ -140,14 +140,14 @@ public class Datafetch
 				if ((sw.ElapsedMilliseconds < 1500)&&(sw.ElapsedMilliseconds > 500))
 				{
 					string IntervalString = interval.ToString();
-					FileWriter.TxtSaveByStr("Interval", IntervalString);
+//					FileWriter.TxtSaveByStr("Interval", IntervalString);
 					timeBuffer [HRBeatCounter] = Convert.ToDouble(interval)/1000; 
 					HRBeatCounter++;
 					if (HRBeatCounter == 10)
 					{
 						HRBeatCounter = 0;						
 					}
-
+					
 				}
 				for (int i = 0; i < timeBuffer.Length; i++)
 				{
@@ -177,18 +177,18 @@ public class Datafetch
 							double sd = Math.Sqrt(sumOfSquaresOfDifferences / HrvBuffer.Length);
 							Hrv = sd;
 						}
-
+						
 					}
 					timeSum = 0;				
 				}
-					SumFlag = 1;
-					SumHRVflag = 1;
-					//if (ECGCounter)
-					sw.Reset();
-					sw.Start();
-				}
-
-// calculate the Breathing peak
+				SumFlag = 1;
+				SumHRVflag = 1;
+				//if (ECGCounter)
+				sw.Reset();
+				sw.Start();
+			}
+			
+			// calculate the Breathing peak
 			sampleAir0 = BreVoltage*5;
 			AirBuffer [AirCounter] = sampleAir0;
 			AirCounter ++;
@@ -207,7 +207,7 @@ public class Datafetch
 			if ((near_peakAir == 1) && (sampleAGAir < upper_boundAir))//&&(PeakFlagBre == 1)
 			{
 				near_peakAir = 0;
-//				timeDiff = DateTime.Now - start;
+				//				timeDiff = DateTime.Now - start;
 				sw_Air.Stop();
 				interval_Air = sw_Air.ElapsedMilliseconds;//(long)timeDiff.TotalMilliseconds
 				//tc = sw.Elapsed;
@@ -215,7 +215,7 @@ public class Datafetch
 				if (interval_Air > 1000)
 				{
 					string IntervalBreString = interval_Air.ToString();
-					FileWriter.TxtSaveByStr("IntervalBre", IntervalBreString);
+//					FileWriter.TxtSaveByStr("IntervalBre", IntervalBreString);
 					timeBuffer_Air [BreathingCounter_air] = Convert.ToDouble(interval_Air)/1000; 
 					BreathingCounter_air++;
 					if (BreathingCounter_air == 5)
@@ -248,15 +248,10 @@ public class Datafetch
 				sw_Air.Start();
 			}
 			start = DateTime.Now;
-
+			
 			stream.BaseStream.Flush();
-			}
+		}
+		
+	}
 
-	}
-	
-	// This method is used to read data
-	public double GetData()
-	{
-		return (ECGVoltage);
-	}
 };
