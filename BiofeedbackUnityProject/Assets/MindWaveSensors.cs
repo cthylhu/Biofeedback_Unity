@@ -41,7 +41,6 @@ public class MindWaveSensors : MonoBehaviour
 	{
 		Debug.Log (string.Format ("MindWave device Initializing (driver version {0})", ThinkGear.TG_GetDriverVersion ()));
 		tgController = gameObject.AddComponent<ThinkGearController>();
-		//tgController = new ThinkGearController();
 		int result = tgController.setup (Portname);
 		statusText.text = string.Format("Initialized (result {0})", result);
 		// set up listeners for events:
@@ -101,7 +100,6 @@ public class MindWaveSensors : MonoBehaviour
 			tgController.OnHeadsetDataReceived -= this.HandleOnHeadsetDataReceived;
 			tgController.OnHeadsetConnectionError -= this.HandleOnHeadsetConnectionError;
 			tgController.disconnect ();
-			tgController = null;
 		}
 	}
 }

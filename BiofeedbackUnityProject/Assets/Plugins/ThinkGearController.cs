@@ -36,7 +36,7 @@ public class ThinkGearController: MonoBehaviour
 	{
 		handleID = ThinkGear.TG_GetNewConnectionId();
 		if (handleID < 0) {
-			// error in setting up the connection object
+			Debug.Log ("Error in setting up the connection object!", this);
 			return handleID;
 		}
 		connectStatus = ThinkGear.TG_Connect (handleID, portName, baudRate, packetType);
@@ -47,6 +47,7 @@ public class ThinkGearController: MonoBehaviour
 	public bool startReadingData()
 	{
 		if (handleID < 0 || connectStatus < 0) {
+			Debug.Log ("Cannot start reading, no connection!", this);
 			return false;
 		}
 		StartCoroutine(readingLoopStarter());
@@ -97,7 +98,7 @@ public class ThinkGearController: MonoBehaviour
 	// when we receive a headset disconnection request, attempt to disconnect.
 	public void disconnect ()
 	{
-		CancelInvoke ("UpdateHeadsetData");
+		CancelInvoke (); // the only one should be UpdateHeadsetData or none at all
 		reset ();
 		if (OnHeadsetDisconnected != null) {
 			OnHeadsetDisconnected();
