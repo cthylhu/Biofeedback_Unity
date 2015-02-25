@@ -6,7 +6,8 @@ using UnityEngine.UI;
 /// Requires ui Text elements to display the readings
 /// and uses a FileWriter to write them to text files.
 /// </summary>
-public class IomSensors : MonoBehaviour {
+public class IomSensors : MonoBehaviour
+{
 	// the class assumes that the following Text properties are not null!
 	public Text statusText;
 	public Text sclText;
@@ -20,7 +21,8 @@ public class IomSensors : MonoBehaviour {
 	private IOM iom;
 
 	// Called once initally, setting up UI components
-	void Awake() {
+	void Awake ()
+	{
 		statusText.text = "Not connected";
 		sclText.text = "N/A yet";
 		hrvText.text = "N/A yet";
@@ -29,47 +31,51 @@ public class IomSensors : MonoBehaviour {
 	}
 	
 	// Called once when enabled, using this for hardware initialization
-	void Start() {
-		Debug.Log("Iom device Initializing");
-		iom = new IOM();
-		int deviceCount = iom.setup();
-		statusText.text = "Initialized (" + deviceCount + " found)";
-		iom.setAvgNum(10); // set avergae peaks number
-		iom.startReadingData();
+	void Start ()
+	{
+		Debug.Log ("Iom device Initializing");
+		iom = new IOM ();
+		int deviceCount = iom.setup ();
+		statusText.text = string.Format("Initialized ({0} found)", deviceCount);
+		iom.setAvgNum (10); // set avergae peaks number
+		iom.startReadingData ();
 	}
 	
 	// Update is called once per frame
-	void Update() {
+	void Update ()
+	{
 		if (iom != null) {
-			sclData = iom.getSCL();
-			hrvData = iom.getHRV();
-			qrsData = iom.getQRS();
-			bpmData = iom.getBPM();
-			UpdateIomDataUIText();
-			WriteIomDataFile();
+			sclData = iom.getSCL ();
+			hrvData = iom.getHRV ();
+			qrsData = iom.getQRS ();
+			bpmData = iom.getBPM ();
+			UpdateIomDataUIText ();
+			WriteIomDataFile ();
 		}
 	}
 	
-	void UpdateIomDataUIText() {
-		sclText.text = sclData.ToString("R");
-		hrvText.text = hrvData.ToString("R");
-		qrsText.text = qrsData.ToString();
-		bpmText.text = bpmData.ToString("R");
+	void UpdateIomDataUIText ()
+	{
+		sclText.text = sclData.ToString ("R");
+		hrvText.text = hrvData.ToString ("R");
+		qrsText.text = qrsData.ToString ();
+		bpmText.text = bpmData.ToString ("R");
 	}
 	
-	void WriteIomDataFile() {
-		FileWriter.TxtSaveByStr("IomSCL", sclData.ToString("R"));
-		FileWriter.TxtSaveByStr("IomHRV", hrvData.ToString("R"));
-		FileWriter.TxtSaveByStr("IomQRS", qrsData.ToString());
-		FileWriter.TxtSaveByStr("IomBPM", bpmData.ToString("R"));
+	void WriteIomDataFile ()
+	{
+		FileWriter.TxtSaveByStr ("Iom_SCL", sclData.ToString ("R"));
+		FileWriter.TxtSaveByStr ("Iom_HRV", hrvData.ToString ("R"));
+		FileWriter.TxtSaveByStr ("Iom_QRS", qrsData.ToString ());
+		FileWriter.TxtSaveByStr ("Iom_BPM", bpmData.ToString ("R"));
 	}
 	
-	void OnDestroy()
+	void OnDestroy ()
 	{
 		if (iom != null) {
-			Debug.Log("Iom Device Exiting");
-			iom.stopReadingData();
-			iom.close(); // free the resources
+			Debug.Log ("Iom Device Exiting");
+			iom.stopReadingData ();
+			iom.close (); // free the resources
 			iom = null;
 		}
 	}
