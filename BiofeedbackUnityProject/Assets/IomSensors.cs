@@ -3,10 +3,11 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Iom sensors. Searching for, initializing, and reading from Iom finger sensors.
-/// Uses ui Text elements to display the readings
-/// as well as a FileWriter to write them to text files.
+/// Requires ui Text elements to display the readings
+/// and uses a FileWriter to write them to text files.
 /// </summary>
 public class IomSensors : MonoBehaviour {
+	// the class assumes that the following Text properties are not null!
 	public Text statusText;
 	public Text sclText;
 	public Text hrvText;
@@ -39,12 +40,14 @@ public class IomSensors : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update() {
-		sclData = iom.getSCL();
-		hrvData = iom.getHRV();
-		qrsData = iom.getQRS();
-		bpmData = iom.getBPM();
-		UpdateIomDataUIText();
-		WriteIomDataFile();
+		if (iom != null) {
+			sclData = iom.getSCL();
+			hrvData = iom.getHRV();
+			qrsData = iom.getQRS();
+			bpmData = iom.getBPM();
+			UpdateIomDataUIText();
+			WriteIomDataFile();
+		}
 	}
 	
 	void UpdateIomDataUIText() {
@@ -61,11 +64,13 @@ public class IomSensors : MonoBehaviour {
 		FileWriter.TxtSaveByStr("IomBPM", bpmData.ToString("R"));
 	}
 	
-	void OnApplicationQuit()
+	void OnDestroy()
 	{
-		Debug.Log("Iom Device Exiting");
-		iom.stopReadingData();
-		iom.close(); // free the resources
-		iom = null;
+		if (iom != null) {
+			Debug.Log("Iom Device Exiting");
+			iom.stopReadingData();
+			iom.close(); // free the resources
+			iom = null;
+		}
 	}
 }
