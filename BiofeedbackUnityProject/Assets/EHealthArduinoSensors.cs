@@ -21,6 +21,9 @@ public class EHealthArduinoSensors : MonoBehaviour
 	private double eGSRvalueData;
 	private double eHRpData;
 	private EHealthArduino ehArd;
+	// port can be set in the inspector of the Panel for now (TODO: auto-discovery)
+	// common name on Mac OS: /dev/tty.usbmodemXYZ (where XYZ are numbers)
+	public string Portname = "COM4";
 	
 	// Called once initally, setting up UI components
 	void Awake ()
@@ -34,7 +37,7 @@ public class EHealthArduinoSensors : MonoBehaviour
 	{
 		Debug.Log ("EHealth-Arduino device Initializing");
 		ehArd = new EHealthArduino ();
-		ehArd.setup ();
+		ehArd.setup (Portname);
 		statusText.text = "Initialized";
 //		ehArd.setAvgNum (10); // set avergae peaks number
 		ehArd.startReadingData ();

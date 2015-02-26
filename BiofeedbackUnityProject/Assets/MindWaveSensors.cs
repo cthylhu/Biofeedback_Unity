@@ -22,6 +22,8 @@ public class MindWaveSensors : MonoBehaviour
 
 	// Use this for Mindwave connection
 	private ThinkGearController tgController;
+	// port can be set in the inspector of the Panel for now (TODO: auto-discovery)
+	// common name on Mac OS: /dev/tty.usbmodemXYZ (where XYZ are numbers)
 	public string Portname = "COM5";
 
 	// Called once initally, setting up UI components

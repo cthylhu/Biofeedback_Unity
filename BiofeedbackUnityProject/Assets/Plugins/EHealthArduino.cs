@@ -62,10 +62,10 @@ public class EHealthArduino
 	public DateTime start;
 	public TimeSpan timeDiff;
 
-	public void setup ()
+	public void setup (string portName = "COM4")
 	{
-		// Set the port (com4) and the baud rate (9600, is standard on most devices)
-		stream = new SerialPort ("COM4", 115200);
+		// Set the port and the baud rate (9600, is standard on most devices)
+		stream = new SerialPort (portName, 115200);
 		sw = Stopwatch.StartNew ();
 		sw_Air = Stopwatch.StartNew ();
 	}
