@@ -11,10 +11,10 @@ using System.Threading;
 /// and older http://www.engr.wisc.edu/bme/faculty/tompkins_willis/Pan.pdf
 /// 
 /// Exposed values that are updated while the thread is running:
-/// SCL (float, raw skin conductance level)
-/// HRV (float, raw heart rate variance)
+/// SCL (double, raw skin conductance level)
+/// HRV (double, raw heart rate variance)
 /// QRS (bool, true if we are probably inside a qrs complex - the peak of the heart signals)
-/// BPM (float, calculated heart rate in beats per minute)
+/// BPM (double, calculated heart rate in beats per minute)
 /// </summary>
 public class IOM
 {
@@ -24,10 +24,10 @@ public class IOM
 		public float scl;
 	};
 	private hrv_scl hs;
-	private float scl = -1f;
-	private float hrv = -1f;
+	private double scl = -1f;
+	private double hrv = -1f;
 	private bool qrs = false;
-	private float bpm = -1f;
+	private double bpm = -1f;
 	private int averagingCount = 5;
 	private Thread readUpdateThread;
 	private bool threadRunning = false;
@@ -53,7 +53,7 @@ public class IOM
 		if (readUpdateThread != null) { // should not happen, just return alive status
 			return readUpdateThread.IsAlive;
 		}
-		readUpdateThread = new Thread(new ThreadStart(this.readAndUpdateData));
+		readUpdateThread = new Thread(this.readAndUpdateData);
 		//readUpdateThread.IsBackground = true; // not used as it potentially hides problems
 		readUpdateThread.Start();
 		return true;
@@ -74,11 +74,11 @@ public class IOM
 		}
 	}
 
-	public float getSCL() {
+	public double getSCL() {
 		return scl;
 	}
 	
-	public float getHRV() {
+	public double getHRV() {
 		return hrv;
 	}
 	
@@ -86,7 +86,7 @@ public class IOM
 		return qrs;
 	}
 	
-	public float getBPM() {
+	public double getBPM() {
 		return bpm;
 	}
 	
@@ -101,16 +101,16 @@ public class IOM
 	/// </summary>
 	private void readAndUpdateData() {
 		this.threadRunning = true; // signal that we are running
-		float hrv_sample;
-		float prev_hrv_sample = 1.5f; // reasonable default value
+		double hrv_sample;
+		double prev_hrv_sample = 1.5f; // reasonable default value
 		int max_sample_difference = 5;
-		float peakAG = 0f;
-		float _attack = 0.9875f;
-		float _decay = 0.992f;
-		float gain;
-		float sampleAG;
-		float lower_bound = 0.9975f;
-		float upper_bound = 0.99f;
+		double peakAG = 0f;
+		double _attack = 0.9875f;
+		double _decay = 0.992f;
+		double gain;
+		double sampleAG;
+		double lower_bound = 0.9975f;
+		double upper_bound = 0.99f;
 		int near_peak = 0;
 		int beats = 0;
 		int BPM;
@@ -120,8 +120,8 @@ public class IOM
 		long TICKS_PER_SEC = 10000000; // ticks are in 100-nanosecond intervals
 		int index;
 
-		float avgSeg;
-		float varSeg;
+		double avgSeg;
+		double varSeg;
 
 		while (this.threadRunning) {
 			Thread.Sleep(1); // always briefly give up control every loop
@@ -160,7 +160,7 @@ public class IOM
 					tc = DateTime.Now.Ticks;
 					index = beats % averagingCount;
 					BPM = (int) (60 * averagingCount * TICKS_PER_SEC / (tc - tl[index]));
-					avgSeg = (float) (tc - tl[index]) / averagingCount;
+					avgSeg = (double) (tc - tl[index]) / averagingCount;
 					varSeg = 0;
 					for (int p = 0; p < averagingCount; p++) {
 						if (p == 0) {
@@ -178,7 +178,7 @@ public class IOM
 						}
 					}
 					this.bpm = BPM;
-					this.hrv = (float) Math.Sqrt(varSeg / averagingCount) / TICKS_PER_SEC; // TODO: check validity of setting hrv here!
+					this.hrv = Math.Sqrt(varSeg / averagingCount) / TICKS_PER_SEC; // TODO: check validity of setting hrv here!
 					tl[index] = tc;
 				} else {
 					tl[beats] = DateTime.Now.Ticks;

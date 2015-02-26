@@ -14,10 +14,10 @@ public class IomSensors : MonoBehaviour
 	public Text hrvText;
 	public Text qrsText;
 	public Text bpmText;
-	private float sclData;	// Skin Conductance Level
-	private float hrvData;	// Heart Rate Variability
+	private double sclData;	// Skin Conductance Level
+	private double hrvData;	// Heart Rate Variability
 	private bool qrsData;	// in a QRS complex right now? (a heart signal peak)
-	private float bpmData;	// Heart beats per minute
+	private double bpmData;	// Heart beats per minute
 	private IOM iom;
 
 	// Called once initally, setting up UI components
