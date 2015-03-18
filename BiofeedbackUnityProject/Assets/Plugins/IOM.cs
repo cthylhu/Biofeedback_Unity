@@ -32,13 +32,13 @@ public class IOM
 	private Thread readUpdateThread;
 	private bool threadRunning = false;
 
-	[DllImport ("IOMPlugin")]
+	[DllImport ("IOMPlugin", SetLastError=true)]
 	private static extern int iom_setup(); // returns number of iom devices found and sets up the first one.
 	
-	[DllImport ("IOMPlugin")]
+	[DllImport ("IOMPlugin", SetLastError=true)]
 	private static extern hrv_scl iom_get_hrvscl(); // returns both measurements. call iom_setup once first.
 	
-	[DllImport ("IOMPlugin")]
+	[DllImport ("IOMPlugin", SetLastError=true)]
 	private static extern int iom_close(); // deletes the previously set up iom device.
 
 	public int setup() {
