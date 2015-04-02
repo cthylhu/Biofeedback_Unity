@@ -22,7 +22,7 @@ public class MindWaveSensors : MonoBehaviour
 
 	// Use this for Mindwave connection
 	private ThinkGearController tgController;
-	// port can be set in the inspector of the Panel for now (TODO: auto-discovery)
+	// initially tried port can be set in the inspector of the Panel for now
 	// common name on Mac OS: /dev/tty.usbmodemXYZ (where XYZ are numbers)
 	public string Portname = "COM5";
 
@@ -41,15 +41,15 @@ public class MindWaveSensors : MonoBehaviour
 	// Called once when enabled, using this for hardware initialization
 	void Start ()
 	{
-		Debug.Log (string.Format ("MindWave device Initializing (driver version {0})", ThinkGear.TG_GetDriverVersion ()));
+		Debug.Log ("MindWave device Initializing");
 		tgController = gameObject.AddComponent<ThinkGearController>();
-		int result = tgController.setup (Portname);
-		statusText.text = string.Format("Initialized (result {0})", result);
 		// set up listeners for events:
 		tgController.OnHeadsetConnected += this.HandleOnHeadsetConnected;
+		// tgController.OnHeadsetDisconnected ignored for now.
 		tgController.OnHeadsetDataReceived += this.HandleOnHeadsetDataReceived;
 		tgController.OnHeadsetConnectionError += this.HandleOnHeadsetConnectionError;
-		tgController.startReadingData();
+		tgController.setup (Portname);
+		statusText.text = "Initialized";
 	}
 	
 	public void HandleOnHeadsetConnected(int packetCount)
