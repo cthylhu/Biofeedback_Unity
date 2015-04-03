@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 using NeuroSky.ThinkGear;
 using NLog;
 
@@ -10,16 +11,18 @@ using NLog;
  * in your Unity project to control and receive data from the headset.
  * 
  * Basic methods:
- * setup - sets up the connection
- * startReadingData - triggers the start of the continuous reading loop
- * disconnect
+ * setup - sets up the connection and triggers the start of the continuous reading loop
+ * disconnect - stops the loop
  * 
  * Events are defined in the class using the C# delegate/event mechanism:
+ * All the events will be called from Update() and therefore in the Unity main loop
+ * (necessarily with some delay from the originating event in the reading loop),
+ * so the event handlers can use unity functions.
  */
 
 public delegate void HeadsetConnected(int packetCount); // Sent when the headset has successfully sent data the first time
 public delegate void HeadsetDisconnected(); // Sent when the headset has been disconnected
-public delegate void HeadsetDataReceived(IDictionary<string, float> data); // Sent when data is received from the headset
+public delegate void HeadsetDataReceived(IDictionary<string, double> data); // Sent when data is received from the headset
 public delegate void HeadsetConnectionError(int packetError); // Sent when a startReadingData attempt failed.
 
 public class ThinkGearController: MonoBehaviour
@@ -29,7 +32,17 @@ public class ThinkGearController: MonoBehaviour
 	public event HeadsetDataReceived OnHeadsetDataReceived;
 	public event HeadsetConnectionError OnHeadsetConnectionError;
 
+	public const string dataLabelsString =
+		"PoorSignal Attention Meditation HeartRate EegPowerDelta EegPowerTheta EegPowerAlpha1 EegPowerAlpha2 EegPowerBeta1 EegPowerBeta2 EegPowerGamma1 EegPowerGamma2";
+	public static readonly string[] dataLabels = dataLabelsString.Split();
+
 	private Connector connector;
+	// internal task queue for communication with unity thread:
+	private delegate void Task();
+	private Queue<Task> TaskQueue = new Queue<Task>();
+	private object _queueLock = new object();
+	private const int MAX_TASKS_PER_FRAME = 5;
+	private const int MAX_TASKS_IN_QUEUE = 100;
 
 	// connect to a new ThinkGear device for reading if found
 	public void setup(string portName = "COM7")
@@ -45,16 +58,6 @@ public class ThinkGearController: MonoBehaviour
 		connector.ConnectScan (portName);
 	}
 
-	void HandleOnDeviceConnected(object sender, EventArgs e)
-	{	
-		Connector.DeviceEventArgs deviceEventArgs = (Connector.DeviceEventArgs) e;
-		Debug.Log( "New Headset Created: " + deviceEventArgs.Device.PortName );
-		if (OnHeadsetConnected != null) {
-			OnHeadsetConnected(0); // TODO: meaningful return value?
-		}
-		deviceEventArgs.Device.DataReceived += this.HandleOnDataReceived;
-	}
-
 	// when we receive a headset disconnection request, attempt to disconnect.
 	public void disconnect ()
 	{
@@ -64,10 +67,51 @@ public class ThinkGearController: MonoBehaviour
 			OnHeadsetDisconnected();
 		}
 	}
+	
+	// Update is called once per frame: get tasks from the queue in main thread
+	void Update ()
+	{
+		lock (_queueLock) {
+			if (TaskQueue.Count >= MAX_TASKS_IN_QUEUE) {
+				Debug.LogWarning("TGController: TaskQueue full!!!");
+			}
+			int taskCount = MAX_TASKS_PER_FRAME;
+			while (TaskQueue.Count > 0 && taskCount > 0) {
+				TaskQueue.Dequeue()();
+				taskCount--;
+			}
+		}
+	}
+	
+	private void ScheduleTask(Task newTask)
+	{
+		lock (_queueLock) {
+			if (TaskQueue.Count < MAX_TASKS_IN_QUEUE) { // warn in eventdispatcher (i.e. Update())
+				TaskQueue.Enqueue(newTask);
+			}
+		}
+	}
+
+	// All the handlers below are called from the reading thread, and therefore
+	// need to use ScheduleTask to dispatch events to the main unity thread!
+	
+	void HandleOnDeviceConnected(object sender, EventArgs e)
+	{	
+		Connector.DeviceEventArgs deviceEventArgs = (Connector.DeviceEventArgs) e;
+		Debug.Log( "New Headset Created: " + deviceEventArgs.Device.PortName );
+		ScheduleTask(new Task(delegate {
+			if (OnHeadsetConnected != null) {
+				OnHeadsetConnected(0); // TODO: meaningful return value?
+			}
+		}));
+		// set up event handling for data:
+		deviceEventArgs.Device.DataReceived += this.HandleOnDataReceived;
+	}
 
 	void HandleOnDeviceValidating(object sender, EventArgs e)
 	{
-		Debug.Log ("ThinkGearController DeviceValidating: " + e);
+		Connector.ConnectionEventArgs connEventArgs = (Connector.ConnectionEventArgs) e;
+		Debug.Log ("ThinkGearController DeviceValidating: " + connEventArgs.Connection);
 	}
 	
 	void HandleOnDeviceFound(object sender, EventArgs e)
@@ -83,74 +127,53 @@ public class ThinkGearController: MonoBehaviour
 	void HandleOnDeviceConnectFail(object sender, EventArgs e)
 	{
 		Debug.Log ("ThinkGearController DeviceConnectFail: " + e);
-		if (OnHeadsetConnectionError != null) {
-			OnHeadsetConnectionError(0);
-		}
+		ScheduleTask(new Task(delegate {
+			if (OnHeadsetConnectionError != null) {
+				OnHeadsetConnectionError(0);
+			}
+		}));
 	}
 	
 	void HandleOnDeviceDisconnected(object sender, EventArgs e)
 	{
 		Debug.Log ("ThinkGearController DeviceDisconnected: " + e);
-		if (OnHeadsetDisconnected != null) {
-			OnHeadsetDisconnected();
-		}
+		ScheduleTask(new Task(delegate {
+			if (OnHeadsetDisconnected != null) {
+				OnHeadsetDisconnected();
+			}
+		}));
 	}
 	
 	void HandleOnDataReceived(object sender, EventArgs e)
 	{
 		Debug.Log ("ThinkGearController DataReceived: " + e);
 		/* Cast the event sender as a Device object, and e as the Device's DataEventArgs */
-		Device d = (Device) sender;
+		//Device d = (Device) sender;
 		Device.DataEventArgs de = (Device.DataEventArgs) e;
 		/* Create a TGParser to parse the Device's DataRowArray[] */
 		TGParser tgParser = new TGParser();
 		tgParser.Read( de.DataRowArray );
 		/* Loop through parsed data TGParser for its parsed data... */
 		for ( int i = 0; i < tgParser.ParsedData.Length; i++ ) {
-			// See the Data Types documentation for valid keys such
-			// as "Raw", "PoorSignal", "Attention", etc.			
-			if( tgParser.ParsedData[i].ContainsKey("Raw") ){
-				Debug.Log( "Raw Value:" + tgParser.ParsedData[i]["Raw"] );
-			}
-			if( tgParser.ParsedData[i].ContainsKey("PoorSignal") ){
-				Debug.Log( "PQ Value:" + tgParser.ParsedData[i]["PoorSignal"] );
-			}			
-			if( tgParser.ParsedData[i].ContainsKey("Attention") ) {
-				Debug.Log( "Att Value:" + tgParser.ParsedData[i]["Attention"] );
-			}
-			if( tgParser.ParsedData[i].ContainsKey("Meditation") ) {
-				Debug.Log( "Med Value:" + tgParser.ParsedData[i]["Meditation"] );
-			}
+			ReportData(tgParser.ParsedData[i]);
 		}
-		// TODO: change above to report via OnHeadsetDataReceived, see below
-	}
-	
-	// Repeating callback method to retrieve data from the headset
-	private int UpdateHeadsetData ()
-	{
-		int packetCount = 0; //ThinkGear.TG_ReadPackets (handleID, -1);
-		if (packetCount > 0) {
-			ReportData();
-		}
-		return packetCount;
 	}
 
-	private void ReportData ()
+	private void ReportData(IDictionary<string, double> readings)
 	{
-		IDictionary<string, float> values = new Dictionary<string, float> ();
-/*		values.Add ("poorSignal", GetDataValue (ThinkGear.DATA_POOR_SIGNAL));  
-		values.Add ("attention", GetDataValue (ThinkGear.DATA_ATTENTION));
-		values.Add ("meditation", GetDataValue (ThinkGear.DATA_MEDITATION));
-		values.Add ("delta", GetDataValue (ThinkGear.DATA_DELTA));
-		values.Add ("theta", GetDataValue (ThinkGear.DATA_THETA));
-		values.Add ("lowAlpha", GetDataValue (ThinkGear.DATA_ALPHA1));
-		values.Add ("highAlpha", GetDataValue (ThinkGear.DATA_ALPHA2));
-		values.Add ("lowBeta", GetDataValue (ThinkGear.DATA_BETA1));
-		values.Add ("highBeta", GetDataValue (ThinkGear.DATA_BETA2));
-		values.Add ("lowGamma", GetDataValue (ThinkGear.DATA_GAMMA1));
-		values.Add ("highGamma", GetDataValue (ThinkGear.DATA_GAMMA2));
-*/		if (OnHeadsetDataReceived != null) {
-			OnHeadsetDataReceived(values);
+		IDictionary<string, double> values = new Dictionary<string, double> ();
+		values.Add ("Time", readings["Time"]); // always need a timestamp value
+		foreach (string key in readings.Keys) {
+			if (dataLabels.Contains(key)) {
+				values.Add (key, readings[key]);
+			} else if (key != "Time" && key != "Raw") {
+				Debug.Log ("TGController: Ignoring data key " + key);
+			}
 		}
+		ScheduleTask(new Task(delegate {
+			if (OnHeadsetDataReceived != null) {
+				OnHeadsetDataReceived(values);
+			}
+		}));
 	}
 }

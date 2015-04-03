@@ -14,11 +14,10 @@ public class MindWaveSensors : MonoBehaviour
 	public Text attentionText;
 	public Text meditationText;
 	// Other data is read, but no Texts need to be set for it
-	private const string otherDataLabelsString =
-		"delta theta lowAlpha highAlpha lowBeta highBeta lowGamma highGamma";
-	[Header("Other data in order: " + otherDataLabelsString)]
+	[Header("All data in order: " + ThinkGearController.dataLabelsString)]
 	public Text otherDataText;
-	private static readonly string[] otherDataLabels = otherDataLabelsString.Split();
+	// cache of last updated values:
+	private IDictionary<string, double> lastReceivedData = new Dictionary<string, double>();
 
 	// Use this for Mindwave connection
 	private ThinkGearController tgController;
@@ -35,6 +34,9 @@ public class MindWaveSensors : MonoBehaviour
 		meditationText.text = "N/A yet";
 		if (otherDataText != null) {
 			otherDataText.text = "N/A yet";
+		}
+		foreach (string label in ThinkGearController.dataLabels) {
+			lastReceivedData.Add (label, 0.0);
 		}
 	}
 	
@@ -63,34 +65,35 @@ public class MindWaveSensors : MonoBehaviour
 		// potential TODO: from here we should set the UI checkbox to unchecked again
 	}
 
-	public void HandleOnHeadsetDataReceived(IDictionary<string, float> data)
+	public void HandleOnHeadsetDataReceived(IDictionary<string, double> data)
 	{
-		UpdateMindWaveDataUIText(data);
-		WriteMindWaveDataFile(data);
+		double timestamp = data["Time"];
+		foreach (string key in data.Keys) {
+			if (key == "Time") continue;
+			lastReceivedData[key] = data[key];
+			WriteMindWaveDataFile(timestamp, key, data[key]);
+		}
+		UpdateMindWaveDataUIText(lastReceivedData);
 	}
 
-	void UpdateMindWaveDataUIText (IDictionary<string, float> data)
+	void UpdateMindWaveDataUIText (IDictionary<string, double> data)
 	{
-		poorSignalText.text = data["poorSignal"].ToString ("R");
-		attentionText.text = data["attention"].ToString ("R");
-		meditationText.text = data["meditation"].ToString ("R");
+		poorSignalText.text = data["PoorSignal"].ToString ("R");
+		attentionText.text = data["Attention"].ToString ("R");
+		meditationText.text = data["Meditation"].ToString ("R");
 		if (otherDataText != null) {
 			string others = "";
-			foreach (string label in otherDataLabels) {
+			foreach (string label in ThinkGearController.dataLabels) {
 				others += string.Format ("{0}: \t{1}\n", label, data[label].ToString ("R"));
 			}
 			otherDataText.text = others;
 		}
 	}
 	
-	void WriteMindWaveDataFile (IDictionary<string, float> data)
+	void WriteMindWaveDataFile (double timestamp, string key, double dataValue)
 	{
-		FileWriter.TxtSaveByStr ("MindWave_poorSignal", data["poorSignal"].ToString ("R"));
-		FileWriter.TxtSaveByStr ("MindWave_attention", data["attention"].ToString ("R"));
-		FileWriter.TxtSaveByStr ("MindWave_meditation", data["meditation"].ToString ("R"));
-		foreach (string dataLabel in otherDataLabels) {
-			FileWriter.TxtSaveByStr ("MindWave_" + dataLabel, data[dataLabel].ToString ("R"));
-		}
+		// TODO: also write timestamp information to data files!
+		FileWriter.TxtSaveByStr ("MindWave_" + key, dataValue.ToString ("R"));
 	}
 
 	void OnDestroy ()
