@@ -111,7 +111,7 @@ public class ThinkGearController: MonoBehaviour
 	void HandleOnDeviceValidating(object sender, EventArgs e)
 	{
 		Connector.ConnectionEventArgs connEventArgs = (Connector.ConnectionEventArgs) e;
-		Debug.Log ("ThinkGearController DeviceValidating: " + connEventArgs.Connection);
+		Debug.Log ("ThinkGearController DeviceValidating: " + connEventArgs.Connection.PortName);
 	}
 	
 	void HandleOnDeviceFound(object sender, EventArgs e)

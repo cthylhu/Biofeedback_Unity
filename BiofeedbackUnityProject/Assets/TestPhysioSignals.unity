@@ -1949,7 +1949,7 @@ MonoBehaviour:
   attentionText: {fileID: 2118548926}
   meditationText: {fileID: 333941721}
   otherDataText: {fileID: 2120674372}
-  Portname: COM5
+  Portname: COM4
 --- !u!114 &985553363
 MonoBehaviour:
   m_ObjectHideFlags: 0
