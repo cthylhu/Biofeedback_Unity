@@ -11,7 +11,9 @@ public class IomSensors : MonoBehaviour
 	// the class assumes that the following Text properties are not null!
 	public Text statusText;
 	public Text sclText;
+	public Grapher sclGraph;
 	public Text hrvText;
+	public Grapher hrvGraph;
 	public Text qrsText;
 	public Text bpmText;
 	private double sclData;	// Skin Conductance Level
@@ -51,6 +53,12 @@ public class IomSensors : MonoBehaviour
 			bpmData = iom.getBPM ();
 			UpdateIomDataUIText ();
 			WriteIomDataFile ();
+			if (sclGraph != null) {
+				sclGraph.AddPoint(Time.realtimeSinceStartup, sclData);
+			}
+			if (hrvGraph != null) {
+				hrvGraph.AddPoint(Time.realtimeSinceStartup, hrvData);
+			}
 		}
 	}
 	
