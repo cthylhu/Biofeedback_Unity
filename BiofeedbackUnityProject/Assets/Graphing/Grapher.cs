@@ -15,7 +15,7 @@ using System;
 /// is intended to keep the graph updating when the source goes dark and
 /// could be shown with smaller size points for those auto points.
 /// 
-/// TODO: axes and labels
+/// TODO: labels
 /// </summary>
 public class Grapher : MonoBehaviour {
 	public const int MAX_POINTS = 100;
@@ -27,30 +27,30 @@ public class Grapher : MonoBehaviour {
 	private List<Vector2> points = new List<Vector2>(MAX_POINTS);
 	private ParticleSystem.Particle[] particles = new ParticleSystem.Particle[MAX_POINTS];
 	private int newestIndex = -1;
-	// scaling bounds: start at 0,0 so it will always be in the graph initially
-	private Vector2 minXY = new Vector2(0f, 0f);
-	private Vector2 maxXY = new Vector2(0f, 0f);
+	// scaling bounds: set initially when the first point is added
+	private Vector2 minXY;
+	private Vector2 maxXY;
 	private bool needRescaling = false;
 
 	private ParticleSystem _particleSystem;
 
 	void Awake () {
 		this._particleSystem = GetComponent<ParticleSystem>();
-		// Adjust the axes for x and y based on width and height
+		// Adjust the axes for x and y based on width and height:
 		rescale ();
 	}
 
+/*
 	void Start () {
 		// Add some random points for testing
 		AddPoint(0, 0);
 		AddPoint(0.5, 0.5);
 		AddPoint(1, 1);
-/*		AddPoint(15, 41);
-		AddPoint(51, 111);
-		AddPoint(111, 31);
-		AddPoint(31, 11);
-*/	}
-
+		AddPoint(15, 41);
+		AddPoint(51, 11);
+	}
+*/
+	
 	void Update () {
 		if (width != _width) {
 			if (width <= float.Epsilon * 1000) {
@@ -79,11 +79,25 @@ public class Grapher : MonoBehaviour {
 	}
 
 	public void AddPoint(float x, float y) {
-		checkBounds(x, y);
-		if (points.Count == MAX_POINTS) {
-			// check if point to be removed was at one of the minmax limits
-			// and recalcBounds if so.
-			points.RemoveAt(0);
+		if (points.Count < 1) {
+			minXY = new Vector2(x, y);
+			maxXY = new Vector2(x, y);
+		} else {
+			if (points.Count == MAX_POINTS) {
+				// remove oldest point but check if it was at one of the minmax limits and recalcBounds if so
+				Vector2 oldPt = points[0];
+				points.RemoveAt(0);
+				if (NearlyEqual(minXY.x, oldPt.x, float.Epsilon * 100f)
+				    || NearlyEqual(minXY.y, oldPt.y, float.Epsilon * 100f)
+				    || NearlyEqual(maxXY.x, oldPt.x, float.Epsilon * 100f)
+				    || NearlyEqual(maxXY.y, oldPt.y, float.Epsilon * 100f)) {
+					recalcBounds (); // will also set needRescaling
+				}
+			}
+			checkBounds(x, y); // might set needRescaling
+			if (needRescaling) {
+				rescale();
+			}
 		}
 		points.Add(new Vector2(x, y));
 		addParticle(x, y);
@@ -97,7 +111,7 @@ public class Grapher : MonoBehaviour {
 		// x and y need to be scaled to 0 and width or height, respectively
 		float scaledX = scaleValue(x - minXY.x, maxXY.x - minXY.x, _width);
 		float scaledY = scaleValue(y - minXY.y, maxXY.y - minXY.y, _height);
-		Debug.Log (string.Format("new particle: x {0} y {1} scaledX {2} scaledY {3}", x, y, scaledX, scaledY)); 
+		//Debug.Log (string.Format("new particle: x {0} y {1} scaledX {2} scaledY {3}", x, y, scaledX, scaledY)); 
 		particles[newestIndex].position = new Vector3(scaledX, scaledY, 0f);
 		particles[newestIndex].color = new Color(0.5f + scaledX/_width, 0.5f + scaledY/_height, 0.9f);
 		particles[newestIndex].size = 5 * _width / MAX_POINTS;
@@ -114,27 +128,30 @@ public class Grapher : MonoBehaviour {
 		if (x < minXY.x) {
 			minXY.x = x;
 			needRescaling = true;
+		} else if (x > maxXY.x) {
+			maxXY.x = x;
+			needRescaling = true;
 		}
 		if (y < minXY.y) {
 			minXY.y = y;
 			needRescaling = true;
-		}
-		if (x > maxXY.x) {
-			maxXY.x = x;
-			needRescaling = true;
-		}
-		if (y > maxXY.y) {
+		} else if (y > maxXY.y) {
 			maxXY.y = y;
 			needRescaling = true;
 		}
-		if (needRescaling) {
-			rescale();
+	}
+
+	private void recalcBounds() {
+		if (points.Count > 0) {
+			minXY = new Vector2(points[0].x, points[0].y);
+			maxXY = new Vector2(points[0].x, points[0].y);
+			foreach (Vector2 pt in points) {
+				checkBounds(pt.x, pt.y); // touches points[0] again, no harm
+			}
 		}
 	}
 
-	private void rescale(bool recalcBounds=false) {
-		needRescaling = false;
-		// TODO: axis!
+	private void rescale() {
 		foreach (Transform child in transform) {
 			if (child.name == "XAxis") {
 				child.localPosition = new Vector3(_width / 2, child.localPosition.y, child.localPosition.z);
@@ -144,18 +161,17 @@ public class Grapher : MonoBehaviour {
 				child.localScale = new Vector3(child.localScale.x, _height / 2, child.localScale.z);
 			}
 		}
-		if (points.Count < 1) {
-			return;
+		if (points.Count > 0) {
+			newestIndex = -1;
+			foreach (Vector2 pt in points) {
+				addParticle(pt.x, pt.y);
+			}
 		}
-		// TODO: recalcBounds?
-		newestIndex = -1;
-		foreach (Vector2 pt in points) {
-			addParticle(pt.x, pt.y);
-		}
+		needRescaling = false;
 	}
 
 	public bool NearlyEqual(float a, float b, float epsilon) {
-		if (a == b) { // shortcut, handles infinities
+		if (a == b) { // also handles infinities
 			return true;
 		} else {
 			float diff = Math.Abs(a - b);
