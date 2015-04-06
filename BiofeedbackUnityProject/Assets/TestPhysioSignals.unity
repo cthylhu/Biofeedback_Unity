@@ -470,6 +470,10 @@ Prefab:
       propertyPath: m_Name
       value: IomSclGrapher
       objectReference: {fileID: 0}
+    - target: {fileID: 11478984, guid: 3c80ef671c15c42468e6066c2c00e985, type: 2}
+      propertyPath: scaleDownY
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3c80ef671c15c42468e6066c2c00e985, type: 2}
   m_IsPrefabParent: 0
@@ -1546,6 +1550,10 @@ Prefab:
     - target: {fileID: 124582, guid: 3c80ef671c15c42468e6066c2c00e985, type: 2}
       propertyPath: m_Name
       value: IomHrvGrapher
+      objectReference: {fileID: 0}
+    - target: {fileID: 11478984, guid: 3c80ef671c15c42468e6066c2c00e985, type: 2}
+      propertyPath: scaleDownY
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3c80ef671c15c42468e6066c2c00e985, type: 2}

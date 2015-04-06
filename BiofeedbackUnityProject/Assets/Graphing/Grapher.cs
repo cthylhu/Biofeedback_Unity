@@ -23,6 +23,9 @@ public class Grapher : MonoBehaviour {
 	private float _height = 100;
 	public float width = 800;
 	public float height = 100;
+	// set if the graph should automatically shrink in the two axis when old points are dropped
+	public bool scaleDownX = true;
+	public bool scaleDownY = false;
 
 	private List<Vector2> points = new List<Vector2>(MAX_POINTS);
 	private ParticleSystem.Particle[] particles = new ParticleSystem.Particle[MAX_POINTS];
@@ -57,7 +60,12 @@ public class Grapher : MonoBehaviour {
 				width = _width;
 			} else {
 				_width = width;
-				needRescaling = true;
+				foreach (Transform child in transform) {
+					if (child.name == "XAxis") {
+						child.localPosition = new Vector3(_width / 2, child.localPosition.y, child.localPosition.z);
+						child.localScale = new Vector3(child.localScale.x, _width / 2, child.localScale.z);
+					}
+				}
 			}
 		}
 		if (height != _height) {
@@ -65,7 +73,12 @@ public class Grapher : MonoBehaviour {
 				height = _height;
 			} else {
 				_height = height;
-				needRescaling = true;
+				foreach (Transform child in transform) {
+					if (child.name == "YAxis") {
+						child.localPosition  = new Vector3(child.localPosition.x, _height / 2, child.localPosition.z);
+						child.localScale = new Vector3(child.localScale.x, _height / 2, child.localScale.z);
+					}
+				}
 			}
 		}
 		if (needRescaling) {
@@ -114,7 +127,7 @@ public class Grapher : MonoBehaviour {
 		//Debug.Log (string.Format("new particle: x {0} y {1} scaledX {2} scaledY {3}", x, y, scaledX, scaledY)); 
 		particles[newestIndex].position = new Vector3(scaledX, scaledY, 0f);
 		particles[newestIndex].color = new Color(0.5f + scaledX/_width, 0.5f + scaledY/_height, 0.9f);
-		particles[newestIndex].size = 5 * _width / MAX_POINTS;
+		particles[newestIndex].size = 1.5f * _width / MAX_POINTS;
 	}
 
 	private float scaleValue(float val, float max, float destMax) {
@@ -143,24 +156,25 @@ public class Grapher : MonoBehaviour {
 
 	private void recalcBounds() {
 		if (points.Count > 0) {
+			Vector2 oldMin = minXY;
+			Vector2 oldMax = maxXY;
 			minXY = new Vector2(points[0].x, points[0].y);
 			maxXY = new Vector2(points[0].x, points[0].y);
 			foreach (Vector2 pt in points) {
 				checkBounds(pt.x, pt.y); // touches points[0] again, no harm
 			}
+			if (! scaleDownX) {
+				minXY.x = oldMin.x;
+				maxXY.x = oldMax.x;
+			}
+			if (! scaleDownY) {
+				minXY.y = oldMin.y;
+				maxXY.y = oldMax.y;
+			}
 		}
 	}
 
 	private void rescale() {
-		foreach (Transform child in transform) {
-			if (child.name == "XAxis") {
-				child.localPosition = new Vector3(_width / 2, child.localPosition.y, child.localPosition.z);
-				child.localScale = new Vector3(child.localScale.x, _width / 2, child.localScale.z);
-			} else if (child.name == "YAxis") {
-				child.localPosition  = new Vector3(child.localPosition.x, _height / 2, child.localPosition.z);
-				child.localScale = new Vector3(child.localScale.x, _height / 2, child.localScale.z);
-			}
-		}
 		if (points.Count > 0) {
 			newestIndex = -1;
 			foreach (Vector2 pt in points) {
