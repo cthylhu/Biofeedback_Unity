@@ -294,6 +294,7 @@ LIGHTSTONE_DECLSPEC lightstone* lightstone_create()
 
 LIGHTSTONE_DECLSPEC void lightstone_delete(lightstone* dev)
 {
+	lightstone_close(dev);
 	free(dev);
 }
 
