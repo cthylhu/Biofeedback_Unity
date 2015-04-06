@@ -1,0 +1,282 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FB5361A41AD304BE00031BDB /* IOMPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB53619A1AD304BE00031BDB /* IOMPlugin.cpp */; };
+		FB5361A71AD304BE00031BDB /* lightstone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB53619D1AD304BE00031BDB /* lightstone.cpp */; };
+		FB5361B01AD31B6C00031BDB /* hid.c in Sources */ = {isa = PBXBuildFile; fileRef = FB5361AE1AD31B6C00031BDB /* hid.c */; };
+		FB5361B21AD31B9A00031BDB /* lightstone_hidapi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB5361B11AD31B9A00031BDB /* lightstone_hidapi.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		FB53618C1AD303AA00031BDB /* IOMPlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IOMPlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB5361901AD303AA00031BDB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FB53619A1AD304BE00031BDB /* IOMPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOMPlugin.cpp; sourceTree = "<group>"; };
+		FB53619D1AD304BE00031BDB /* lightstone.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lightstone.cpp; sourceTree = "<group>"; };
+		FB53619E1AD304BE00031BDB /* lightstone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lightstone.h; sourceTree = "<group>"; };
+		FB5361AE1AD31B6C00031BDB /* hid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hid.c; path = hidapi/hid.c; sourceTree = "<group>"; };
+		FB5361AF1AD31B6C00031BDB /* hidapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hidapi.h; path = hidapi/hidapi.h; sourceTree = "<group>"; };
+		FB5361B11AD31B9A00031BDB /* lightstone_hidapi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lightstone_hidapi.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FB5361891AD303AA00031BDB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FB5361831AD303AA00031BDB = {
+			isa = PBXGroup;
+			children = (
+				FB53618E1AD303AA00031BDB /* IOMPlugin */,
+				FB53618D1AD303AA00031BDB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FB53618D1AD303AA00031BDB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FB53618C1AD303AA00031BDB /* IOMPlugin.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FB53618E1AD303AA00031BDB /* IOMPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				FB5361B11AD31B9A00031BDB /* lightstone_hidapi.cpp */,
+				FB5361AE1AD31B6C00031BDB /* hid.c */,
+				FB5361AF1AD31B6C00031BDB /* hidapi.h */,
+				FB53619A1AD304BE00031BDB /* IOMPlugin.cpp */,
+				FB53619D1AD304BE00031BDB /* lightstone.cpp */,
+				FB53619E1AD304BE00031BDB /* lightstone.h */,
+				FB53618F1AD303AA00031BDB /* Supporting Files */,
+			);
+			path = IOMPlugin;
+			sourceTree = "<group>";
+		};
+		FB53618F1AD303AA00031BDB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FB5361901AD303AA00031BDB /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FB53618B1AD303AA00031BDB /* IOMPlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FB5361931AD303AA00031BDB /* Build configuration list for PBXNativeTarget "IOMPlugin" */;
+			buildPhases = (
+				FB5361881AD303AA00031BDB /* Sources */,
+				FB5361891AD303AA00031BDB /* Frameworks */,
+				FB53618A1AD303AA00031BDB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IOMPlugin;
+			productName = IOMPlugin;
+			productReference = FB53618C1AD303AA00031BDB /* IOMPlugin.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FB5361841AD303AA00031BDB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0620;
+				ORGANIZATIONNAME = "Rank,Stefan";
+				TargetAttributes = {
+					FB53618B1AD303AA00031BDB = {
+						CreatedOnToolsVersion = 6.2;
+					};
+				};
+			};
+			buildConfigurationList = FB5361871AD303AA00031BDB /* Build configuration list for PBXProject "IOMPlugin" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = FB5361831AD303AA00031BDB;
+			productRefGroup = FB53618D1AD303AA00031BDB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FB53618B1AD303AA00031BDB /* IOMPlugin */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FB53618A1AD303AA00031BDB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FB5361881AD303AA00031BDB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB5361A71AD304BE00031BDB /* lightstone.cpp in Sources */,
+				FB5361B21AD31B9A00031BDB /* lightstone_hidapi.cpp in Sources */,
+				FB5361A41AD304BE00031BDB /* IOMPlugin.cpp in Sources */,
+				FB5361B01AD31B6C00031BDB /* hid.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FB5361911AD303AA00031BDB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		FB5361921AD303AA00031BDB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FB5361941AD303AA00031BDB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = IOMPlugin/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/IOMPlugin/libusb-1.0",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		FB5361951AD303AA00031BDB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = IOMPlugin/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/IOMPlugin/libusb-1.0",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FB5361871AD303AA00031BDB /* Build configuration list for PBXProject "IOMPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB5361911AD303AA00031BDB /* Debug */,
+				FB5361921AD303AA00031BDB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FB5361931AD303AA00031BDB /* Build configuration list for PBXNativeTarget "IOMPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB5361941AD303AA00031BDB /* Debug */,
+				FB5361951AD303AA00031BDB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FB5361841AD303AA00031BDB /* Project object */;
+}
