@@ -47,7 +47,7 @@ void loop() {
   int air = eHealth.getAirFlow();
   float Air = (float)air*5/1023;
   float GSR = eHealth.getSkinConductance();
-  int HR = eHealth.getBPM();
+  int HR = eHealth.getBPM();    //HR from pulseoximeter
   Serial.print("B");
   Serial.print(","); 
   Serial.print(ECG, 2); 
@@ -56,7 +56,7 @@ void loop() {
   Serial.print(","); 
   Serial.print(GSR, 2); 
   Serial.print(","); 
-  Serial.println(HR);
+  Serial.println(HR); 
   delay(1);	// wait for a millisecond
 }
 //Include always this code when using the pulsioximeter sensor

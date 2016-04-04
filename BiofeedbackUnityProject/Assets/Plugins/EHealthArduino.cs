@@ -23,7 +23,7 @@ public class EHealthArduino
 	private bool threadRunning = false;
 	public double ECGVoltage;
 	public double BreVoltage;
-	public double eGSRvalue;
+	public double GSRread;
 	public  int HRBeatCounter = 0, BreathingCounter_air = 0, AirCounter = 0, ECGCounter = 0, HrvCounter = 0;
 	//	HR peak parameters
 	public double peakAG = 0;
@@ -47,7 +47,7 @@ public class EHealthArduino
 	public int near_peakAir = 0;
 	public int beats = 0, AvgNum = 0;
 	public long tc, interval, interval_Air;
-	public double timeSum, HrBeat, timeSum_Air, BreathingBeat, Hrv, eHRp;
+	public double timeSum, HrBeat, timeSum_Air, BreathingBeat, Hrv, PulseOxHR;
 	public Stopwatch sw, sw_Air;
 	public double[] timeBuffer = new double[10];
 	public double[] HrvBuffer = new double[10]; // 
@@ -62,7 +62,7 @@ public class EHealthArduino
 	public DateTime start;
 	public TimeSpan timeDiff;
 
-	public void setup (string portName = "COM4")
+	public void setup (string portName = "COM6")
 	{
 		// Set the port and the baud rate (9600, is standard on most devices)
 		stream = new SerialPort (portName, 115200);
@@ -113,10 +113,10 @@ public class EHealthArduino
 			string[] vec2 = value.Split (',');
 			string firstchar = value.Substring (0, 1);
 			if (firstchar.Equals ("B")) {
-				ECGVoltage = double.Parse (vec2 [1]);//double.Parse(value.Substring(1));
+				ECGVoltage = double.Parse (vec2 [1]);     //double.Parse(value.Substring(1));
 				BreVoltage = double.Parse (vec2 [2]);
-				eGSRvalue = double.Parse (vec2 [3]);
-				eHRp = double.Parse (vec2 [4]);           // HR from Pulseoximeter
+				GSRread = double.Parse (vec2 [3]);
+				PulseOxHR = double.Parse (vec2 [4]);           
 				//Get the ECG max
 				MaxBufferECG [MaxCounterECG] = ECGVoltage;
 				MaxValueECG = MaxBufferECG.Max ();
