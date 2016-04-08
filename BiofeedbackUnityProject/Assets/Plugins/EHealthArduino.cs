@@ -62,7 +62,7 @@ public class EHealthArduino
 	public DateTime start;
 	public TimeSpan timeDiff;
 
-	public void setup (string portName = "COM6")
+	public void setup (string portName)
 	{
 		// Set the port and the baud rate (9600, is standard on most devices)
 		stream = new SerialPort (portName, 115200);

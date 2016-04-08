@@ -4,10 +4,19 @@ clear; clear all;close all;
 %eHealthECG = load('EHealth_rawECG.txt');  %ECG raw data
 delimiterIn = ',';
 headlinesIn = 0;
+
 eHealthECG = importdata('EHealth_rawECG.txt', delimiterIn);
 eHealthGSR = importdata('EHealth_GSR.txt', delimiterIn);   % GSR from E-health platform
 eHealthHRV = importdata('EHealth_HRV.txt', delimiterIn);
 eHealthHB = importdata('EHealth_hrBeat.txt', delimiterIn);  % calculated Heart Beat Rate
+
+%{
+eHealthECG = importdata('EHealth2_rawECG.txt', delimiterIn);
+eHealthGSR = importdata('EHealth2_GSR.txt', delimiterIn);   % GSR from E-health platform
+eHealthHRV = importdata('EHealth2_HRV.txt', delimiterIn);
+eHealthHB = importdata('EHealth2_hrBeat.txt', delimiterIn);  % calculated Heart Beat Rate
+%}
+
 %eHealthGSR = load('EHealth_GSR.txt');     
 %eBreathing = load('Breathing.txt'); % breathing raw data
 %eBR = load('BR.txt');               %calculated breathing rate

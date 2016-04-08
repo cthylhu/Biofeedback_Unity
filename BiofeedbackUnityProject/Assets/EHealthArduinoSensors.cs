@@ -11,6 +11,11 @@ public class EHealthArduinoSensors : MonoBehaviour
 	// the class assumes that the following Text properties are not null!
 	public Text statusText;
 	public Text dataText;
+	public Text rawECGText;
+	public Text hrBeatText;
+	public Text intervalText;
+	public Text eHRVText;
+	public Text eGSRText;
 	private double rawECGData;
 	private double hrBeatData;
 	private double intervalData;
@@ -24,6 +29,7 @@ public class EHealthArduinoSensors : MonoBehaviour
 	// port can be set in the inspector of the Panel for now (TODO: auto-discovery)
 	// common name on Mac OS: /dev/tty.usbmodemXYZ (where XYZ are numbers)
 	public string Portname;
+	public int ID_num;
 	public int markNumber = 1;
 	public double timestamp;
 	
@@ -32,6 +38,11 @@ public class EHealthArduinoSensors : MonoBehaviour
 	{
 		statusText.text = "Not connected";
 		dataText.text = "N/A yet";
+		rawECGText.text = "N/A yet";
+		hrBeatText.text = "N/A yet";
+		intervalText.text = "N/A yet";
+		eHRVText.text = "N/A yet";
+		eGSRText.text = "N/A yet";
 	}
 	
 	// Called once when enabled, using this for hardware initialization
@@ -40,7 +51,7 @@ public class EHealthArduinoSensors : MonoBehaviour
 		Debug.Log ("EHealth-Arduino device Initializing");
 		ehArd = new EHealthArduino ();
 		ehArd.setup (Portname);
-		statusText.text = "Initialized";
+		statusText.text = "Initialized "+Portname;
 //		ehArd.setAvgNum (10); // set avergae peaks number
 		ehArd.startReadingData ();
 	}
@@ -53,11 +64,13 @@ public class EHealthArduinoSensors : MonoBehaviour
 			hrBeatData = ehArd.HrBeat;
 			intervalData = ehArd.interval;
 			hrvData = ehArd.Hrv;
-			//rawBreathingData = ehArd.sampleAir;
-			//breathingBeatData = ehArd.BreathingBeat;
-			//intervalAirData = ehArd.interval_Air; 	//unused: breathing sensor
 			eGSRvalueData = ehArd.GSRread;
-			//eHRpData = ehArd.PulseOxHR;					//unused: pulseoximeter
+			
+			rawBreathingData = ehArd.sampleAir;				//unused: breathing sensor
+			breathingBeatData = ehArd.BreathingBeat;
+			intervalAirData = ehArd.interval_Air; 	
+			eHRpData = ehArd.PulseOxHR;						//unused: pulseoximeter
+
 			timestamp = Time.time;
 			UpdateEHealthArduinoDataUIText ();
 			WriteEHealthArduinoDataFile ();
@@ -73,25 +86,48 @@ public class EHealthArduinoSensors : MonoBehaviour
 
 	void UpdateEHealthArduinoDataUIText ()
 	{
-		dataText.text = string.Format ("hrBeat: \t{0}\ninterval: \t{1}\nhrv: \t{2}\nbreathingBeat: \t{3}\n"
-		                               + "intervalAir: \t{4}\neGSRvalue: \t{5}\neHRp: \t{6}\nrawECG: \t{7}\nrawBreathing: \t{8}",
-		hrBeatData, intervalData, hrvData, breathingBeatData, intervalAirData, eGSRvalueData, eHRpData, rawECGData, rawBreathingData);
+		/*dataText.text = string.Format ("hrBeat: \t{0}\ninterval: \t{1}\nhrv: \t{2}\nbreathingBeat: \t{3}\n"
+		 	+ "intervalAir: \t{4}\neGSRvalue: \t{5}\neHRp: \t{6}\nrawECG: \t{7}\nrawBreathing: \t{8}",
+			hrBeatData, intervalData, hrvData, breathingBeatData, intervalAirData, eGSRvalueData, eHRpData, rawECGData, rawBreathingData);*/
+		/*dataText.text = string.Format ("rawECG: \t{0}\nhrBeat: \t{1}\ninterval: \t{2}\nhrv: \t{3}\n"+ "eGSRvalue: \t{4}",
+				rawECGData, hrBeatData, intervalData, hrvData, eGSRvalueData);*/
+		rawECGText.text = rawECGData.ToString ("R");
+		hrBeatText.text = hrBeatData.ToString ("R");
+		intervalText.text = intervalData.ToString ("R");
+		eHRVText.text = hrvData.ToString ("R");
+		eGSRText.text = eGSRvalueData.ToString ("R");
 	}
 	
 	void WriteEHealthArduinoDataFile ()
 	{
-		FileWriter.TxtSaveByStr ("EHealth_rawECG", rawECGData.ToString ("R")+","+timestamp+","+"0");
-		FileWriter.TxtSaveByStr ("EHealth_HRV", hrvData.ToString ("R")+","+timestamp+","+"0");
-		FileWriter.TxtSaveByStr ("EHealth_hrBeat", hrBeatData.ToString ("R")+","+timestamp+","+"0");
-		FileWriter.TxtSaveByStr ("EHealth_GSR", eGSRvalueData.ToString ("R")+","+timestamp+","+"0");
+		if (ID_num == 1) {
+			FileWriter.TxtSaveByStr ("EHealth_rawECG", rawECGData.ToString ("R") + "," + timestamp + "," + "0");
+			FileWriter.TxtSaveByStr ("EHealth_HRV", hrvData.ToString ("R") + "," + timestamp + "," + "0");
+			FileWriter.TxtSaveByStr ("EHealth_hrBeat", hrBeatData.ToString ("R") + "," + timestamp + "," + "0");
+			FileWriter.TxtSaveByStr ("EHealth_GSR", eGSRvalueData.ToString ("R") + "," + timestamp + "," + "0");
+		} 
+		else {
+			FileWriter.TxtSaveByStr ("EHealth2_rawECG", rawECGData.ToString ("R") + "," + timestamp + "," + "0");
+			FileWriter.TxtSaveByStr ("EHealth2_HRV", hrvData.ToString ("R") + "," + timestamp + "," + "0");
+			FileWriter.TxtSaveByStr ("EHealth2_hrBeat", hrBeatData.ToString ("R") + "," + timestamp + "," + "0");
+			FileWriter.TxtSaveByStr ("EHealth2_GSR", eGSRvalueData.ToString ("R") + "," + timestamp + "," + "0");
+		}
 	}
 	
 	void WriteTimeStamp ()
 	{
-		FileWriter.TxtSaveByStr ("EHealth_rawECG", rawECGData.ToString ("R")+","+timestamp+","+"1");
-		FileWriter.TxtSaveByStr ("EHealth_HRV", hrvData.ToString ("R")+","+timestamp+","+"1");
-		FileWriter.TxtSaveByStr ("EHealth_hrBeat", hrBeatData.ToString ("R")+","+timestamp+","+"1");		// Third column = 1 if there is a mark
-		FileWriter.TxtSaveByStr ("EHealth_GSR", eGSRvalueData.ToString ("R")+","+timestamp+","+"1");
+		if (ID_num == 1) {
+			FileWriter.TxtSaveByStr ("EHealth_rawECG", rawECGData.ToString ("R") + "," + timestamp + "," + "1");		// Third column = 1 if there is a mark
+			FileWriter.TxtSaveByStr ("EHealth_HRV", hrvData.ToString ("R") + "," + timestamp + "," + "1");
+			FileWriter.TxtSaveByStr ("EHealth_hrBeat", hrBeatData.ToString ("R") + "," + timestamp + "," + "1");		
+			FileWriter.TxtSaveByStr ("EHealth_GSR", eGSRvalueData.ToString ("R") + "," + timestamp + "," + "1");
+		} 
+		else {
+			FileWriter.TxtSaveByStr ("EHealth2_rawECG", rawECGData.ToString ("R") + "," + timestamp + "," + "1");		// Third column = 1 if there is a mark
+			FileWriter.TxtSaveByStr ("EHealth2_HRV", hrvData.ToString ("R") + "," + timestamp + "," + "1");
+			FileWriter.TxtSaveByStr ("EHealth2_hrBeat", hrBeatData.ToString ("R") + "," + timestamp + "," + "1");		
+			FileWriter.TxtSaveByStr ("EHealth2_GSR", eGSRvalueData.ToString ("R") + "," + timestamp + "," + "1");
+		}
 	}
 	
 	void OnDestroy ()
@@ -99,7 +135,7 @@ public class EHealthArduinoSensors : MonoBehaviour
 		if (ehArd != null) {
 			Debug.Log ("EHealth-Arduino Device Exiting");
 			ehArd.stopReadingData ();
-//			ehArd.close (); // free the resources
+		//	ehArd.close (); // free the resources
 			ehArd = null;
 		}
 	}
