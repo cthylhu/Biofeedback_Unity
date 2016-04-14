@@ -9,6 +9,9 @@ using System.Threading;
 /// Concepts: http://www.cvphysiology.com/Arrhythmias/A009.htm
 /// Calculation: http://www.biomedical-engineering-online.com/content/3/1/28
 /// and older http://www.engr.wisc.edu/bme/faculty/tompkins_willis/Pan.pdf
+///
+/// TODO: integrate more explicit calculation from documents above, using insights from lightstone4net code
+/// TODO: add a timestampe to any reading as soon as possible
 /// 
 /// Exposed values that are updated while the thread is running:
 /// SCL (double, raw skin conductance level)
