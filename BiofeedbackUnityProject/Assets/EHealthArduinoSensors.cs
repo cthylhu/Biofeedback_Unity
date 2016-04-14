@@ -16,6 +16,8 @@ public class EHealthArduinoSensors : MonoBehaviour
 	public Text intervalText;
 	public Text eHRVText;
 	public Text eGSRText;
+    public Grapher sclGraph;
+    public Grapher ecgGraph;
 	private double rawECGData;
 	private double hrBeatData;
 	private double intervalData;
@@ -75,8 +77,13 @@ public class EHealthArduinoSensors : MonoBehaviour
 			UpdateEHealthArduinoDataUIText ();
 			WriteEHealthArduinoDataFile ();
 		}
-		
-		if (Input.GetKeyDown("space")) {
+        if (sclGraph != null) {
+            sclGraph.AddPoint(Time.realtimeSinceStartup, eGSRvalueData);
+        }
+        if (ecgGraph != null) {
+            ecgGraph.AddPoint(Time.realtimeSinceStartup, rawECGData);
+        }
+        if (Input.GetKeyDown("space")) {
 			WriteTimeStamp ();
 			Debug.Log("=====MARK"+markNumber+"=====");
 			markNumber++;
