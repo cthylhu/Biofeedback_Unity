@@ -83,6 +83,10 @@ namespace PhySigTK
 		{
 			this.ThreadRunning = true; // signal that we are running
 			Stream.Open();
+			// in case this is a restarted read, clear stale buffers:
+			Stream.DiscardOutBuffer();
+			Stream.DiscardInBuffer();
+			Stream.ReadLine(); // discard up to next newline
 			while (this.ThreadRunning) {
 				Thread.Sleep(1); // always briefly give up control every loop
 				try {
