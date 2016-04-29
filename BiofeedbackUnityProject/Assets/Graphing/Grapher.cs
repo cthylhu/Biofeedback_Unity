@@ -126,8 +126,8 @@ public class Grapher : MonoBehaviour {
 		float scaledY = scaleValue(y - minXY.y, maxXY.y - minXY.y, _height);
 		//Debug.Log (string.Format("new particle: x {0} y {1} scaledX {2} scaledY {3}", x, y, scaledX, scaledY)); 
 		particles[newestIndex].position = new Vector3(scaledX, scaledY, 0f);
-		particles[newestIndex].color = new Color(0.5f + scaledX/_width, 0.5f + scaledY/_height, 0.9f);
-		particles[newestIndex].size = 1.5f * _width / MAX_POINTS;
+		particles[newestIndex].startColor = new Color(0.5f + scaledX/_width, 0.5f + scaledY/_height, 0.9f);
+		particles[newestIndex].startSize = 1.5f * _width / MAX_POINTS;
 	}
 
 	private float scaleValue(float val, float max, float destMax) {
