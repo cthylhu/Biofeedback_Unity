@@ -27,10 +27,8 @@ public class EHealthArduinoSensors : MonoBehaviour
 	private double intervalAirData;
 	private double eGSRvalueData;
 	private double eHRpData;
-	private EHealthArduino ehArd;
 	// port can be set in the inspector of the Panel for now (TODO: auto-discovery)
 	// common name on Mac OS: /dev/tty.usbmodemXYZ (where XYZ are numbers)
-	public string Portname;
 	public int ID_num;
 	public int markNumber = 1;
 	public double timestamp;
@@ -47,36 +45,12 @@ public class EHealthArduinoSensors : MonoBehaviour
 		eGSRText.text = "N/A yet";
 	}
 	
-	// Called once when enabled, using this for hardware initialization
-	void Start ()
-	{
-		Debug.Log ("EHealth-Arduino device Initializing");
-		ehArd = new EHealthArduino ();
-		ehArd.setup (Portname);
-		statusText.text = "Initialized "+Portname;
-//		ehArd.setAvgNum (10); // set avergae peaks number
-		ehArd.startReadingData ();
-	}
-	
 	// Update is called once per frame
 	void Update ()
 	{
-		if (ehArd != null) {
-			rawECGData = ehArd.ECGVoltage;
-			hrBeatData = ehArd.HrBeat;
-			intervalData = ehArd.interval;
-			hrvData = ehArd.Hrv;
-			eGSRvalueData = ehArd.GSRread;
-			
-			rawBreathingData = ehArd.sampleAir;				//unused: breathing sensor
-			breathingBeatData = ehArd.BreathingBeat;
-			intervalAirData = ehArd.interval_Air; 	
-			eHRpData = ehArd.PulseOxHR;						//unused: pulseoximeter
-
-			timestamp = Time.time;
-			UpdateEHealthArduinoDataUIText ();
-			WriteEHealthArduinoDataFile ();
-		}
+		timestamp = Time.time;
+//		UpdateEHealthArduinoDataUIText ();
+//		WriteEHealthArduinoDataFile ();
         if (sclGraph != null) {
             sclGraph.AddPoint(Time.realtimeSinceStartup, eGSRvalueData);
         }
@@ -137,13 +111,4 @@ public class EHealthArduinoSensors : MonoBehaviour
 		}
 	}
 	
-	void OnDestroy ()
-	{
-		if (ehArd != null) {
-			Debug.Log ("EHealth-Arduino Device Exiting");
-			ehArd.stopReadingData ();
-		//	ehArd.close (); // free the resources
-			ehArd = null;
-		}
-	}
 }
