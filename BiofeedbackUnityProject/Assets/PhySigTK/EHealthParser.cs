@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
 
 namespace PhySigTK
 {
@@ -9,56 +11,71 @@ namespace PhySigTK
 	/// </summary>
 	public class EHealthParser
 	{
-		private List<TimeStampedValue<float>> NewEMGValues = new List<TimeStampedValue<float>>();
-		private List<TimeStampedValue<float>> NewSCLValues = new List<TimeStampedValue<float>>();
-		private List<TimeStampedValue<float>> NewECGValues = new List<TimeStampedValue<float>>();
+		private TimeStampedFloatList NewEMGValues;
+		private TimeStampedFloatList NewSCLValues;
+		private TimeStampedFloatList NewECGValues;
 
-		// previous format for cathy: B,1.76,0.01,-1.00,0
-		// B,ecg,air,gsr,hr
-		// previous format for Jal: bpm spo2 gsr emg (all space-separated)
-		// format now: ECG0.1|SCL0.5|EMG100
+		private void InitLists()
+		{
+			if (NewECGValues == null) {
+				NewECGValues = new TimeStampedFloatList();
+			}
+			if (NewEMGValues == null) {
+				NewEMGValues = new TimeStampedFloatList();
+			}
+			if (NewSCLValues == null) {
+				NewSCLValues = new TimeStampedFloatList();
+			}
+		}
+
+		// format: ECG0.1|SCL0.5|EMG100
 		public void ParseValues(TimeStampedValue<string>[] values)
 		{
+			InitLists();
 			foreach (TimeStampedValue<string> val in values) {
 				long timeStamp = val.TimeStamp;
 				foreach (string datapoint in val.Value.Split('|')) {
-					if (datapoint.StartsWith("EMG")) {
-						int emgInt = int.Parse(datapoint.Substring(3));
-						// should be an integer smaller than 1024, map to 1-5V float
-						float emgFloat = 5.0f * (emgInt / 1024.0f);
-						NewEMGValues.Add(new TimeStampedValue<float>(timeStamp, emgFloat));
-					} else if (datapoint.StartsWith("ECG")) {
-						float ecgFloat = float.Parse(datapoint.Substring(3));
-						NewECGValues.Add(new TimeStampedValue<float>(timeStamp, ecgFloat));
-					} else if (datapoint.StartsWith("SCL")) {
-						float sclFloat = float.Parse(datapoint.Substring(3));
-						NewSCLValues.Add(new TimeStampedValue<float>(timeStamp, sclFloat));
-					} else {
-						throw new PhySigTKException("EHealthParser: unknown datapoint: " + datapoint);
+					try {
+						if (datapoint.StartsWith("EMG")) {
+							int emgInt = int.Parse(datapoint.Substring(3));
+							// should be an integer smaller than 1024, map to 1-5V float
+							float emgFloat = 5.0f * (emgInt / 1024.0f);
+							NewEMGValues.Add(new TimeStampedValue<float>(timeStamp, emgFloat));
+						} else if (datapoint.StartsWith("ECG")) {
+							float ecgFloat = float.Parse(datapoint.Substring(3));
+							NewECGValues.Add(new TimeStampedValue<float>(timeStamp, ecgFloat));
+						} else if (datapoint.StartsWith("SCL")) {
+							float sclFloat = float.Parse(datapoint.Substring(3));
+							NewSCLValues.Add(new TimeStampedValue<float>(timeStamp, sclFloat));
+						} else {
+							Debug.LogWarning("EHealthParser: unknown/truncated datapoint: " + datapoint);
+						}
+					} catch (FormatException) {
+						Debug.LogWarning("EHealthParser: unparseable datapoint: " + datapoint);
 					}
 				}
 				// TODO: ecg values need to be adapted, scr detection, smoothing...
 			}
 		}
 
-		public TimeStampedValue<float>[] RetrieveNewEMGValues()
+		public TimeStampedFloatList RetrieveNewEMGValues()
 		{
-			TimeStampedValue<float>[] values = NewEMGValues.ToArray();
-			NewEMGValues.Clear();
+			TimeStampedFloatList values = NewEMGValues;
+			NewEMGValues = null;
 			return values;
 		}
 
-		public TimeStampedValue<float>[] RetrieveNewECGValues()
+		public TimeStampedFloatList RetrieveNewECGValues()
 		{
-			TimeStampedValue<float>[] values = NewECGValues.ToArray();
-			NewECGValues.Clear();
+			TimeStampedFloatList values = NewECGValues;
+			NewECGValues = null;
 			return values;
 		}
 
-		public TimeStampedValue<float>[] RetrieveNewSCLValues()
+		public TimeStampedFloatList RetrieveNewSCLValues()
 		{
-			TimeStampedValue<float>[] values = NewSCLValues.ToArray();
-			NewSCLValues.Clear();
+			TimeStampedFloatList values = NewSCLValues;
+			NewSCLValues = null;
 			return values;
 		}
 	}

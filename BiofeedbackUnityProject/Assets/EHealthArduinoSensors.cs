@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using PhySigTK;
 
 /// <summary>
 /// eHealth Arduino sensors. Initializing, and reading from Arduino sensors.
@@ -15,7 +16,7 @@ public class EHealthArduinoSensors : MonoBehaviour
 	public Text hrBeatText;
 	public Text intervalText;
 	public Text eHRVText;
-	public Text eGSRText;
+	public Text eSCLText;
     public Grapher sclGraph;
     public Grapher ecgGraph;
 	private double rawECGData;
@@ -25,13 +26,12 @@ public class EHealthArduinoSensors : MonoBehaviour
 	private double rawBreathingData;
 	private double breathingBeatData;
 	private double intervalAirData;
-	private double eGSRvalueData;
+	private double eSCLvalueData;
 	private double eHRpData;
 	// port can be set in the inspector of the Panel for now (TODO: auto-discovery)
 	// common name on Mac OS: /dev/tty.usbmodemXYZ (where XYZ are numbers)
 	public int ID_num;
 	public int markNumber = 1;
-	public double timestamp;
 	
 	// Called once initally, setting up UI components
 	void Awake ()
@@ -42,73 +42,67 @@ public class EHealthArduinoSensors : MonoBehaviour
 		hrBeatText.text = "N/A yet";
 		intervalText.text = "N/A yet";
 		eHRVText.text = "N/A yet";
-		eGSRText.text = "N/A yet";
+		eSCLText.text = "N/A yet";
 	}
 	
-	// Update is called once per frame
+	public void SCLUpdated(TimeStampedFloatList values)
+	{
+		foreach (TimeStampedValue<float> val in values) {
+			eSCLvalueData = val.Value;
+			if (sclGraph != null) {
+				sclGraph.AddPoint(val.TimeStamp, eSCLvalueData);
+			}
+			//WriteEHealthArduinoDataFile("GSR", eSCLvalueData, val.TimeStamp);
+		}
+	}
+
+	public void ECGUpdated(TimeStampedFloatList values)
+	{
+		foreach (TimeStampedValue<float> val in values) {
+			rawECGData = val.Value;
+			if (ecgGraph != null) {
+				ecgGraph.AddPoint(val.TimeStamp, rawECGData);
+			}
+			//WriteEHealthArduinoDataFile("rawECG", rawECGData, val.TimeStamp);
+		}
+	}
+
 	void Update ()
 	{
-		timestamp = Time.time;
-//		UpdateEHealthArduinoDataUIText ();
-//		WriteEHealthArduinoDataFile ();
-        if (sclGraph != null) {
-            sclGraph.AddPoint(Time.realtimeSinceStartup, eGSRvalueData);
-        }
-        if (ecgGraph != null) {
-            ecgGraph.AddPoint(Time.realtimeSinceStartup, rawECGData);
-        }
+		UpdateEHealthArduinoDataUIText ();
         if (Input.GetKeyDown("space")) {
-			WriteTimeStamp ();
-			Debug.Log("=====MARK"+markNumber+"=====");
+			WriteAllDataFilesWithMark();
+            Debug.Log("=====MARK"+markNumber+"=====");
 			markNumber++;
-
 		}
 	}
 
 	void UpdateEHealthArduinoDataUIText ()
 	{
-		/*dataText.text = string.Format ("hrBeat: \t{0}\ninterval: \t{1}\nhrv: \t{2}\nbreathingBeat: \t{3}\n"
-		 	+ "intervalAir: \t{4}\neGSRvalue: \t{5}\neHRp: \t{6}\nrawECG: \t{7}\nrawBreathing: \t{8}",
-			hrBeatData, intervalData, hrvData, breathingBeatData, intervalAirData, eGSRvalueData, eHRpData, rawECGData, rawBreathingData);*/
-		/*dataText.text = string.Format ("rawECG: \t{0}\nhrBeat: \t{1}\ninterval: \t{2}\nhrv: \t{3}\n"+ "eGSRvalue: \t{4}",
-				rawECGData, hrBeatData, intervalData, hrvData, eGSRvalueData);*/
 		rawECGText.text = rawECGData.ToString ("R");
 		hrBeatText.text = hrBeatData.ToString ("R");
 		intervalText.text = intervalData.ToString ("R");
 		eHRVText.text = hrvData.ToString ("R");
-		eGSRText.text = eGSRvalueData.ToString ("R");
+		eSCLText.text = eSCLvalueData.ToString ("R");
 	}
-	
-	void WriteEHealthArduinoDataFile ()
+
+	void WriteAllDataFilesWithMark()
 	{
-		if (ID_num == 1) {
-			FileWriter.TxtSaveByStr ("EHealth_rawECG", rawECGData.ToString ("R") + "," + timestamp + "," + "0");
-			FileWriter.TxtSaveByStr ("EHealth_HRV", hrvData.ToString ("R") + "," + timestamp + "," + "0");
-			FileWriter.TxtSaveByStr ("EHealth_hrBeat", hrBeatData.ToString ("R") + "," + timestamp + "," + "0");
-			FileWriter.TxtSaveByStr ("EHealth_GSR", eGSRvalueData.ToString ("R") + "," + timestamp + "," + "0");
-		} 
-		else {
-			FileWriter.TxtSaveByStr ("EHealth2_rawECG", rawECGData.ToString ("R") + "," + timestamp + "," + "0");
-			FileWriter.TxtSaveByStr ("EHealth2_HRV", hrvData.ToString ("R") + "," + timestamp + "," + "0");
-			FileWriter.TxtSaveByStr ("EHealth2_hrBeat", hrBeatData.ToString ("R") + "," + timestamp + "," + "0");
-			FileWriter.TxtSaveByStr ("EHealth2_GSR", eGSRvalueData.ToString ("R") + "," + timestamp + "," + "0");
-		}
+		long timestamp = HiResTiming.CurrentTimeStamp;
+		WriteEHealthArduinoDataFile("rawECG", rawECGData, timestamp, "1");
+		WriteEHealthArduinoDataFile("GSR", eSCLvalueData, timestamp, "1");
+		// TODO: check if those two are still relevant after PhySigTK update:
+		WriteEHealthArduinoDataFile("HRV", hrvData, timestamp, "1");
+		WriteEHealthArduinoDataFile("hrBeat", hrBeatData, timestamp, "1");
 	}
-	
-	void WriteTimeStamp ()
+
+	void WriteEHealthArduinoDataFile (string destination, double data, long timestamp, string mark="0")
 	{
-		if (ID_num == 1) {
-			FileWriter.TxtSaveByStr ("EHealth_rawECG", rawECGData.ToString ("R") + "," + timestamp + "," + "1");		// Third column = 1 if there is a mark
-			FileWriter.TxtSaveByStr ("EHealth_HRV", hrvData.ToString ("R") + "," + timestamp + "," + "1");
-			FileWriter.TxtSaveByStr ("EHealth_hrBeat", hrBeatData.ToString ("R") + "," + timestamp + "," + "1");		
-			FileWriter.TxtSaveByStr ("EHealth_GSR", eGSRvalueData.ToString ("R") + "," + timestamp + "," + "1");
-		} 
-		else {
-			FileWriter.TxtSaveByStr ("EHealth2_rawECG", rawECGData.ToString ("R") + "," + timestamp + "," + "1");		// Third column = 1 if there is a mark
-			FileWriter.TxtSaveByStr ("EHealth2_HRV", hrvData.ToString ("R") + "," + timestamp + "," + "1");
-			FileWriter.TxtSaveByStr ("EHealth2_hrBeat", hrBeatData.ToString ("R") + "," + timestamp + "," + "1");		
-			FileWriter.TxtSaveByStr ("EHealth2_GSR", eGSRvalueData.ToString ("R") + "," + timestamp + "," + "1");
+		string prefix = "EHealth_";
+		if (ID_num != 1) {
+			prefix = "EHealth" + ID_num + "_";
 		}
+		FileWriter.TxtSaveByStr(prefix + destination, data.ToString("R") + "," + timestamp + "," + mark);
 	}
 	
 }

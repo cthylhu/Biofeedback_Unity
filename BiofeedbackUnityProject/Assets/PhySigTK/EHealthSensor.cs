@@ -5,11 +5,6 @@ using System.Collections;
 
 namespace PhySigTK
 {
-	[Serializable]
-	public class TimeStampedDataEvent : UnityEvent<TimeStampedValue<float>[]> { }
-	[Serializable]
-	public class StatusChangeEvent : UnityEvent<string> { }
-
 	/// <summary>
 	/// Represents ehealth arduino sensors.
 	/// Can start readers and use parsers to prepare the values for use.
@@ -26,13 +21,13 @@ namespace PhySigTK
 
 		void Start()
 		{
-			StatusChanged.Invoke("EHealthSensor initializing");
+			StatusChanged.Invoke("Initializing");
 			ehReader = new EHealthReader();
 			ehParser = new EHealthParser();
 			ehReader.Setup();
-			StatusChanged.Invoke("EHealthSensor Setup Port " + ehReader.PortName);
+			StatusChanged.Invoke("Setup Port " + ehReader.PortName);
 			ehReader.StartReadingData();
-			StatusChanged.Invoke("EHealthSensor Reading Port " + ehReader.PortName);
+			StatusChanged.Invoke("Reading Port " + ehReader.PortName);
 		}
 
 		void Update()
@@ -41,19 +36,19 @@ namespace PhySigTK
 			if (values.Length > 0) {
 				ehParser.ParseValues(values);
 				// now retrieve the newest timestampedvalues for EMG, SCL, ECG and trigger events
-				TimeStampedValue<float>[] emgValues = ehParser.RetrieveNewEMGValues();
-				TimeStampedValue<float>[] ecgValues = ehParser.RetrieveNewECGValues();
-				TimeStampedValue<float>[] sclValues = ehParser.RetrieveNewSCLValues();
-				DebugLogValues("EMG", emgValues);
-				DebugLogValues("ECG", ecgValues);
-				DebugLogValues("SCL", sclValues);
+				TimeStampedFloatList emgValues = ehParser.RetrieveNewEMGValues();
+				TimeStampedFloatList ecgValues = ehParser.RetrieveNewECGValues();
+				TimeStampedFloatList sclValues = ehParser.RetrieveNewSCLValues();
+				//DebugLogValues("EMG", emgValues);
+				//DebugLogValues("ECG", ecgValues);
+				//DebugLogValues("SCL", sclValues);
 				EMGUpdated.Invoke(emgValues);
 				ECGUpdated.Invoke(ecgValues);
 				SCLUpdated.Invoke(sclValues);
 			}
 		}
 
-		void DebugLogValues(string prefix, TimeStampedValue<float>[] values)
+		void DebugLogValues(string prefix, TimeStampedFloatList values)
 		{
 			foreach (TimeStampedValue<float> val in values) {
 				Debug.Log(prefix + " " +
@@ -62,11 +57,21 @@ namespace PhySigTK
 			}
 		}
 
-		void OnDestroy()
+		void OnDisable()
 		{
 			if (ehReader != null) {
-				ehReader.StopReadingData();
-				StatusChanged.Invoke("Stopped Reading Port " + ehReader.PortName);
+				if (ehReader.IsReadingData()) {
+					ehReader.StopReadingData();
+					StatusChanged.Invoke("Stopped Reading Port " + ehReader.PortName);
+				}
+			}
+		}
+
+		void OnEnable()
+		{
+			if (ehReader != null) {
+				ehReader.StartReadingData();
+				StatusChanged.Invoke("Restarted Reading Port " + ehReader.PortName);
 			}
 		}
 	}
