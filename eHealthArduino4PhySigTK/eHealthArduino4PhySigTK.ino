@@ -24,7 +24,7 @@
  * Version 0.1
  * Author: Stefan Rank
  */
-#include <eHealth.h>
+#include "eHealth/eHealth.h"
 
 // The setup routine runs once when you press reset:
 void setup() {
