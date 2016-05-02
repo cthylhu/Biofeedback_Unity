@@ -19,6 +19,7 @@ public class EHealthArduinoSensors : MonoBehaviour
 	public Text eSCLText;
     public Grapher sclGraph;
     public Grapher ecgGraph;
+	public Grapher emgGraph;
 	private double rawECGData;
 	private double hrBeatData;
 	private double intervalData;
@@ -64,6 +65,15 @@ public class EHealthArduinoSensors : MonoBehaviour
 				ecgGraph.AddPoint(val.TimeStamp, rawECGData);
 			}
 			//WriteEHealthArduinoDataFile("rawECG", rawECGData, val.TimeStamp);
+		}
+	}
+
+	public void EMGUpdated(TimeStampedFloatList values)
+	{
+		foreach (TimeStampedValue<float> val in values) {
+			if (emgGraph != null) {
+				emgGraph.AddPoint(val.TimeStamp, val.Value);
+			}
 		}
 	}
 

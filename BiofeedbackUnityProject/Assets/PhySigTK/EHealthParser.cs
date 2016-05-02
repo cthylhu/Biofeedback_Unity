@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using System;
 
 namespace PhySigTK
@@ -55,6 +54,10 @@ namespace PhySigTK
 					}
 				}
 				// TODO: ecg values need to be adapted, scr detection, smoothing...
+
+				// interesting values:
+				// peakstart, peakend detection for ECG, interval length for ECG based on peak detection, heart rate beat and heart rate variability based on that
+				// SCL -> SCR responses on/off signal, SCL baseline change signal?
 			}
 		}
 
